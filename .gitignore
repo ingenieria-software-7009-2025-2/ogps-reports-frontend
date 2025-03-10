@@ -1,4 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Ver https://help.github.com/articles/ignoring-files/ para ver sobre los archivos ignorados.
 
 # dependencies
 /node_modules
