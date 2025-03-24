@@ -1,8 +1,8 @@
 import "./App.css";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
+import { Container, Nav, Navbar, Button, Alert } from "react-bootstrap";
 import Inicio from "./modules/home/ui/screens/Inicio";
 import Registro from "./modules/user/ui/screens/Registro";
-import { Container, Nav, Navbar, Button } from "react-bootstrap";
 import LoginForm from "./modules/user/ui/screens/Login";
 import userApi from "./network/userApi";
 import { useEffect, useState } from "react";
@@ -11,44 +11,40 @@ import UpdateInfoForm from "./modules/user/ui/screens/UpdateInfo";
 import UserInfo from "./modules/user/ui/screens/GetInfo";
 
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem("authToken"));
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setToken(localStorage.getItem("authToken"));
-  }, [localStorage.getItem("authToken")]);
+  const location = useLocation();
+  const [message, setMessage] = useState("");
+  const [variant, setVariant] = useState("danger");
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (!token) {
-      navigate("/" + LOGIN_PATH);
+    const publicPaths = [`/${LOGIN_PATH}`, `/${REGISTER_PATH}`];
+    if (!token && !publicPaths.includes(location.pathname)) {
+      navigate(`/${LOGIN_PATH}`);
     }
-  }, []);
+  }, [navigate, location.pathname]);
 
   const logout = () => {
     userApi
       .logout()
       .then((response) => {
         if (response.status === 200) {
-          localStorage.removeItem("authToken");
-          navigate("/" + LOGIN_PATH);
-          //aqui falta eliminar el token de la base de datos, no estoy segura si seria aqui en front o en
-          //el archivo userApi.js en la funcion logout usando axios
+          navigate(`/${LOGIN_PATH}`);
         }
       })
-      .catch((reason) => {
-        console.log("********* reason" + reason);
-
-        localStorage.removeItem("authToken");
-        navigate("/" + LOGIN_PATH);
+      .catch((error) => {
+        setVariant("danger");
+        setMessage("Error al cerrar sesión. Intenta de nuevo.");
+        console.error("Error en el logout:", error);
+        navigate(`/${LOGIN_PATH}`);
       });
   };
 
   const getInfo = () => {
-    navigate("/" + USER_INFO_PATH);
+    navigate(`/${USER_INFO_PATH}`);
   };
-  
 
+  const isAuthenticated = !!localStorage.getItem("authToken");
 
   return (
     <div className="App">
@@ -58,38 +54,52 @@ const App = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {token && <Nav.Link href={HOME_PATH}>Home</Nav.Link>}
-              {/* Eliminamos el enlace "Registrate" */}
+              {isAuthenticated && <Nav.Link href={HOME_PATH}>Home</Nav.Link>}
             </Nav>
             <Nav>
-              {token ? (
-                <><Button variant="outline-light" onClick={logout}>
-                  Logout
-                </Button><Button variant="outline-light" onClick={getInfo}
-                  >
+              {isAuthenticated ? (
+                <>
+                  <Button variant="outline-light" onClick={getInfo}>
                     Get Info
                   </Button>
-                  <Button variant="outline-light" onClick={() => {
-                  navigate("/" + UPDATE_INFO_PATH);
-                  }}
+                  <Button
+                    variant="outline-light"
+                    onClick={() => {
+                      navigate(`/${UPDATE_INFO_PATH}`);
+                    }}
+                    className="ms-2"
                   >
                     Update Info
+                  </Button>
+                  <Button
+                    variant="outline-light"
+                    onClick={logout}
+                    className="ms-2"
+                  >
+                    Logout
                   </Button>
                 </>
               ) : (
                 <Button
                   variant="outline-light"
                   onClick={() => {
-                    navigate("/" + REGISTER_PATH); // Cambiamos LOGIN_PATH por REGISTER_PATH
+                    navigate(`/${REGISTER_PATH}`);
                   }}
                 >
-                  Signup {/* Cambiamos "Login" por "Signup" */}
+                  Signup
                 </Button>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      {message && (
+        <Container className="mt-3">
+          <Alert variant={variant}>{message}</Alert>
+        </Container>
+      )}
+
       <div className="content">
         <Routes>
           <Route path={HOME_PATH} element={<Inicio />} />
@@ -97,7 +107,6 @@ const App = () => {
           <Route path={LOGIN_PATH} element={<LoginForm />} />
           <Route path={UPDATE_INFO_PATH} element={<UpdateInfoForm />} />
           <Route path={USER_INFO_PATH} element={<UserInfo />} />
-          
         </Routes>
       </div>
     </div>

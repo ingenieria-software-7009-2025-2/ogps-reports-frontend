@@ -35,6 +35,7 @@ function Registro() {
         password: password,
         firstName: firstName,
         lastName: lastName,
+        role: "User", // Agregamos el campo role
       })
       .then((response) => {
         if (response.status === 200) {
