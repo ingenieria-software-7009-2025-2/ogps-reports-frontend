@@ -9,7 +9,7 @@ function Inicio() {
           <Card.Body>Bienvenido a OGPS</Card.Body>
         </Card>
       </Stack>
-      {/* Aqui faltaria agregar los botones de ver perfil y consultar perfil, 
+      {/* Aqui faltaria agregar los botones de ver perfil y consultar perfil,
       no se si lo quieran en esta parte o agregar una nueva navbar que sustituya la que esta en App.jsx) */}
     </Container>
   );

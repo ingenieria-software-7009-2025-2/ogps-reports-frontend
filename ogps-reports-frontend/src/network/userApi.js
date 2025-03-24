@@ -10,11 +10,16 @@ const userApiInstance = axios.create({
 const userApi = {
   login: (credentials) => userApiInstance.post("/users/login", credentials),
   logout: () => {
-    const token = localStorage.getItem("authToken");
-    return userApiInstance.post("/users/logout", {
-      headers: { Authorization: `${token}` },
-    });
-  },
+      const token = localStorage.getItem("authToken");
+      return userApiInstance
+        .post("/users/logout", null, {
+          headers: { Authorization: `${token}` },
+        })
+        .finally(() => {
+          // Eliminar el token de localStorage después de la solicitud, tanto si falla como si tiene éxito
+          localStorage.removeItem("authToken");
+        });
+    },
   //crear funciones que faltan para los  demas endpoints
   register: (userData) => {
       return userApiInstance.post("/users", userData);
