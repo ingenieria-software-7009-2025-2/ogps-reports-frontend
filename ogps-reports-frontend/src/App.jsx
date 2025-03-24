@@ -6,7 +6,9 @@ import { Container, Nav, Navbar, Button } from "react-bootstrap";
 import LoginForm from "./modules/user/ui/screens/Login";
 import userApi from "./network/userApi";
 import { useEffect, useState } from "react";
-import { HOME_PATH, REGISTER_PATH, LOGIN_PATH } from "./navigation/sitePaths";
+import { HOME_PATH, REGISTER_PATH, LOGIN_PATH, UPDATE_INFO_PATH, USER_INFO_PATH } from "./navigation/sitePaths";
+import UpdateInfoForm from "./modules/user/ui/screens/UpdateInfo";
+import UserInfo from "./modules/user/ui/screens/GetInfo";
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
@@ -42,6 +44,12 @@ const App = () => {
       });
   };
 
+  const getInfo = () => {
+    navigate("/" + USER_INFO_PATH);
+  };
+  
+
+
   return (
     <div className="App">
       <Navbar expand="lg" bg="dark" data-bs-theme="dark" className="mb-3">
@@ -55,9 +63,19 @@ const App = () => {
             </Nav>
             <Nav>
               {token ? (
-                <Button variant="outline-light" onClick={logout}>
+                <><Button variant="outline-light" onClick={logout}>
                   Logout
-                </Button>
+                </Button><Button variant="outline-light" onClick={getInfo}
+                  >
+                    Get Info
+                  </Button>
+                  <Button variant="outline-light" onClick={() => {
+                  navigate("/" + UPDATE_INFO_PATH);
+                  }}
+                  >
+                    Update Info
+                  </Button>
+                </>
               ) : (
                 <Button
                   variant="outline-light"
@@ -77,6 +95,9 @@ const App = () => {
           <Route path={HOME_PATH} element={<Inicio />} />
           <Route path={REGISTER_PATH} element={<Registro />} />
           <Route path={LOGIN_PATH} element={<LoginForm />} />
+          <Route path={UPDATE_INFO_PATH} element={<UpdateInfoForm />} />
+          <Route path={USER_INFO_PATH} element={<UserInfo />} />
+          
         </Routes>
       </div>
     </div>
