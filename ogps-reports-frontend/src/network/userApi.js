@@ -16,6 +16,9 @@ const userApi = {
     });
   },
   //crear funciones que faltan para los  demas endpoints
+  register: (userData) => {
+      return axios.post(`${API_URL}/users`, userData); // Ajusta el endpoint según tu backend
+    },
 };
 
 export default userApi;

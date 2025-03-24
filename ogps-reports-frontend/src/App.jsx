@@ -30,7 +30,7 @@ const App = () => {
         if (response.status === 200) {
           localStorage.removeItem("authToken");
           navigate("/" + LOGIN_PATH);
-          //aqui falta eliminar el token de la base de datos, no estoy segura si seria aqui en front o en 
+          //aqui falta eliminar el token de la base de datos, no estoy segura si seria aqui en front o en
           //el archivo userApi.js en la funcion logout usando axios
         }
       })
@@ -44,13 +44,14 @@ const App = () => {
 
   return (
     <div className="App">
-      <Navbar expand="lg" bg="dark" data-bs-theme="dark">
+      <Navbar expand="lg" bg="dark" data-bs-theme="dark" className="mb-3">
         <Container>
           <Navbar.Brand>OGPS</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               {token && <Nav.Link href={HOME_PATH}>Home</Nav.Link>}
-              {!token && <Nav.Link href={REGISTER_PATH}>Registrate</Nav.Link>}
+              {/* Eliminamos el enlace "Registrate" */}
             </Nav>
             <Nav>
               {token ? (
@@ -61,17 +62,17 @@ const App = () => {
                 <Button
                   variant="outline-light"
                   onClick={() => {
-                    navigate("/" + LOGIN_PATH);
+                    navigate("/" + REGISTER_PATH); // Cambiamos LOGIN_PATH por REGISTER_PATH
                   }}
                 >
-                  Login
+                  Signup {/* Cambiamos "Login" por "Signup" */}
                 </Button>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div>
+      <div className="content">
         <Routes>
           <Route path={HOME_PATH} element={<Inicio />} />
           <Route path={REGISTER_PATH} element={<Registro />} />
