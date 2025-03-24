@@ -8,7 +8,7 @@ const userApiInstance = axios.create({
 });
 // Definir funciones específicas para la API
 const userApi = {
-  login: (credentials) => userApiInstance.post("/users/login", credentials),  
+  login: (credentials) => userApiInstance.post("/users/login", credentials),
   logout: () => {
     const token = localStorage.getItem("authToken");
     return userApiInstance.post("/users/logout", {
@@ -17,7 +17,7 @@ const userApi = {
   },
   //crear funciones que faltan para los  demas endpoints
   register: (userData) => {
-      return axios.post(`${API_URL}/users`, userData); // Ajusta el endpoint según tu backend
+      return userApiInstance.post("/users", userData);
     },
 };
 
