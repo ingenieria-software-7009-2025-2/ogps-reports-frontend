@@ -15,7 +15,25 @@ const userApi = {
       headers: { Authorization: `${token}` },
     });
   },
+  
   //crear funciones que faltan para los  demas endpoints
+  register: (userData) => {
+      return axios.post(`${API_URL}/users`, userData); // Ajusta el endpoint según tu backend
+    },
+
+  updateInfo: (userData) => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.put("/users/me", userData, {
+      headers: { Authorization: `${token}` },
+    });
+  },
+
+  getMe: () => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.get("/users/me", {
+      headers: { Authorization: `${token}` },
+    });
+  },
 };
 
 export default userApi;

@@ -13,8 +13,10 @@ import {
 import { HOME_PATH } from "../../../../navigation/sitePaths";
 import { useNavigate } from "react-router-dom";
 
+
+
 const LoginForm = () => {
-  const [username, setUsername] = useState("");
+  const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [variant, setVariant] = useState("danger");
@@ -27,7 +29,7 @@ const LoginForm = () => {
 
     userApi
       .login({
-        mail: username,
+        mail: mail,
         password: password,
       })
       .then((response) => {
@@ -55,13 +57,13 @@ const LoginForm = () => {
               <h2 className="text-center">Iniciar Sesión</h2>
               {message && <Alert variant={variant}>{message}</Alert>}
               <Form onSubmit={handleLogin}>
-                <Form.Group controlId="formUsername" className="mb-3">
-                  <Form.Label>Usuario</Form.Label>
+                <Form.Group controlId="formMail" className="mb-3">
+                  <Form.Label>Mail</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu usuario"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Ingresa tu mail"
+                    value={mail}
+                    onChange={(e) => setMail(e.target.value)}
                   />
                 </Form.Group>
 

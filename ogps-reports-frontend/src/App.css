@@ -1,15 +1,40 @@
 .App {
-  width: 80%;  /* Ajusta el ancho al 80% del contenedor */
-  max-width: 900px; /* Evita que se haga demasiado grande */
-  min-width: 600px; /* Evita que se haga demasiado pequeña */
-  margin: auto;  /* Centra horizontalmente */
-  padding: 2rem;
+  width: 100vw; /* Ocupa todo el ancho del viewport */
+  height: 100vh; /* Ocupa toda la altura del viewport */
+  margin: 0;
+  padding: 0;
   text-align: center;
-  background-color: #ffffff; /* Ajusta el color de fondo si es necesario */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Agrega una sombra opcional */
-  border-radius: 10px; /* Bordes redondeados */
+  background-color: #f0f0f0; /* Fondo para toda la pantalla */
+  display: flex;
+  flex-direction: column;
 }
 
+.content {
+  flex: 1; /* Ocupa el espacio restante */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem; /* Agrega un poco de padding para pantallas pequeñas */
+}
+
+/* Ajustes para pantallas medianas y pequeñas */
+@media (max-width: 768px) {
+  .content {
+    padding: 0.5rem; /* Reduce el padding en pantallas pequeñas */
+    align-items: flex-start; /* Alinea el contenido al inicio en pantallas pequeñas */
+    margin-top: 1rem; /* Asegura que no se superponga con el Navbar */
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .content {
+    padding: 0.25rem; /* Reduce aún más el padding */
+    margin-top: 0.5rem; /* Reduce el margen superior */
+  }
+}
+
+/* Mantén el resto de los estilos */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
