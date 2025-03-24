@@ -24,6 +24,20 @@ const userApi = {
   register: (userData) => {
       return userApiInstance.post("/users", userData);
     },
+
+  updateInfo: (userData) => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.put("/users/me", userData, {
+      headers: { Authorization: `${token}` },
+    });
+  },
+
+  getMe: () => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.get("/users/me", {
+      headers: { Authorization: `${token}` },
+    });
+  },
 };
 
 export default userApi;
