@@ -1,42 +1,46 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+.App {
+  width: 80%;  /* Ajusta el ancho al 80% del contenedor */
+  max-width: 900px; /* Evita que se haga demasiado grande */
+  min-width: 600px; /* Evita que se haga demasiado pequeña */
+  margin: auto;  /* Centra horizontalmente */
   padding: 2rem;
   text-align: center;
+  background-color: #ffffff; /* Ajusta el color de fondo si es necesario */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Agrega una sombra opcional */
+  border-radius: 10px; /* Bordes redondeados */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
-@keyframes logo-spin {
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
