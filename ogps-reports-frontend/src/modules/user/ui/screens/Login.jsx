@@ -35,16 +35,46 @@ const LoginForm = () => {
       .then((response) => {
         if (response.status === 200) {
           const { token } = response.data;
-          localStorage.setItem("authToken", token); // Guarda el token en localStorage
+          localStorage.setItem("authToken", token);
           setVariant("success");
           setMessage("Inicio de sesión exitoso");
           navigate(HOME_PATH);
         }
-
       })
-      .catch(() => {
-        setVariant("danger");
-        setMessage("Error al iniciar sesión. Verifica tus credenciales.");
+      .catch((error) => {
+          console.error("Error en login:", error);
+          let handled = false;
+
+          if (error.response) {
+              console.error("Error response:", error.response);
+              switch (error.response.status) {
+                  case 400:
+                      setMessage("Correo con formato inválido.");
+                      handled = true;
+                      break;
+                  case 401: // Nueva condición para credenciales incorrectas
+                      setMessage("Contraseña incorrecta.");
+                      handled = true;
+                      break;
+                  case 404:
+                      setMessage("Correo no registrado.");
+                      handled = true;
+                      break;
+                  case 500:
+                      setMessage("Error del servidor.");
+                      handled = true;
+                      break;
+              }
+          } else if (error.request) {
+              console.error("No hay respuesta del servidor:", error.request);
+              setMessage("No hay respuesta del servidor. Verifica tu conexión.");
+              handled = true;
+          } else {
+              console.error("Error en la configuración de la solicitud:", error.message);
+              setMessage("Error al procesar la solicitud.");
+              handled = true;
+          }
+          setVariant("danger");
       });
   };
 
@@ -64,6 +94,7 @@ const LoginForm = () => {
                     placeholder="Ingresa tu mail"
                     value={mail}
                     onChange={(e) => setMail(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
@@ -74,6 +105,7 @@ const LoginForm = () => {
                     placeholder="Ingresa tu contraseña"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
