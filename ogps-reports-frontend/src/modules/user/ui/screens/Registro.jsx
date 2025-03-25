@@ -16,6 +16,29 @@ function Registro() {
 
   const navigate = useNavigate();
 
+  const checkUsernameAvailability = async (username) => {
+      try {
+        const response = await userApi.checkUsername(username);
+        setUsernameAvailable(response.data.available); // Suponiendo que el backend devuelve { available: true/false }
+      } catch (error) {
+        setUsernameAvailable(false);
+        setMessage("Error checking username availability.");
+        setVariant("danger");
+      }
+    };
+
+    // Función para verificar disponibilidad de correo
+    const checkEmailAvailability = async (email) => {
+      try {
+        const response = await userApi.checkEmail(email);
+        setEmailAvailable(response.data.available); // Suponiendo que el backend devuelve { available: true/false }
+      } catch (error) {
+        setEmailAvailable(false);
+        setMessage("Error checking email availability.");
+        setVariant("danger");
+      }
+    };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     setMessage("");
@@ -39,6 +62,7 @@ function Registro() {
     setMessage("Incoreect credentials. Wrong characters for username.");
     return;
   }
+
     // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
       setVariant("danger");
@@ -78,7 +102,7 @@ function Registro() {
               setMessage("You have to fill all the blank spaces.");
               break;
             default:
-              setMessage("Error.");
+              setMessage("Error with information, try again.");
           }
         } else {
           console.error("Error while confirming the request.", error.message)
