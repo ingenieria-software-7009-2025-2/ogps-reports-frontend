@@ -19,35 +19,34 @@ function Registro() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setMessage("");
-    
+
     if (!userName || !mail || !password || !confirmPassword || !firstName || !lastName) {
       setVariant("danger");
-      setMessage("Credenciales inválidas. No puedes dejar campos vacíos.");
+      setMessage("You have to fill all the blank spaces.");
       return;
     }
 
   const emailVal = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailVal.test(mail)) {
       setVariant("danger");
-      setMessage("Credenciales inválidas. Formato de correo incorrecto.");
+      setMessage("Incorrect format for mail.");
       return;
   }
 
-  // Validación de caracteres inválidos (Ejemplo: solo letras y números en username)
   const usernameVal = /^[a-zA-Z0-9_]+$/;
   if (!usernameVal.test(userName)) {
     setVariant("danger");
-    setMessage("Credenciales inválidas. Caracteres no permitidos en el nombre de usuario.");
+    setMessage("Incoreect credentials. Wrong characters for username.");
     return;
   }
     // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
       setVariant("danger");
-      setMessage("Las contraseñas no coinciden.");
+      setMessage("Passwords do not match.");
       return;
     }
 
-    // Enviar los datos al backend
+    // Send data to the backend
     userApi
       .register({
         userName: userName,
@@ -55,35 +54,35 @@ function Registro() {
         password: password,
         firstName: firstName,
         lastName: lastName,
-        role: "User", // Agregamos el campo role
+        role: "User", // We add the role field
       })
       .then((response) => {
         if (response.status === 200) {
           setVariant("success");
-          setMessage("Registro exitoso. Por favor inicia sesión.");
+          setMessage("Successful registration. Please log in.");
           setTimeout(() => {
             navigate("/" + LOGIN_PATH);
-          }, 2000); // Redirige a la pantalla de login después de 2 segundos
+          }, 2000); // Redirect to login screen after 2 seconds
         }
       })
       .catch((error) => {
         if (error.response) {
           switch (error.response.status) {
             case 400:
-              setMessage("Credenciales inválidas. Formato de correo incorrecto.");
+              setMessage("Wrong format for mail.");
               break;
             case 409:
-              setMessage("Credenciales inválidas. Usuario o correo ya registrado o caracteres inválidos.");
+              setMessage("Username or mail already in use or wrond characters.");
               break;
             case 422:
-              setMessage("Credenciales inválidas. No puedes dejar campos vacíos.");
+              setMessage("You have to fill all the blank spaces.");
               break;
             default:
-              setMessage("Error al registrarse. Verifica tus datos.");
+              setMessage("Error.");
           }
         } else {
-          console.error("Error al confirmar la solicitud", error.message)
-          setMessage("No se pudo conectar con el servidor.");
+          console.error("Error while confirming the request.", error.message)
+          setMessage("Couldn't connect to the server.");
         }
         setVariant("danger");
       });
@@ -95,14 +94,14 @@ function Registro() {
         <Col xs={12} sm={10} md={8} lg={4}>
           <Card className="p-3 p-md-4 shadow">
             <Card.Body>
-              <h2 className="text-center mb-3">Registrarse</h2>
+              <h2 className="text-center mb-3">Sign Up</h2>
               {message && <Alert variant={variant}>{message}</Alert>}
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formUserName" className="mb-3">
-                  <Form.Label>Nombre de usuario</Form.Label>
+                  <Form.Label>Username</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu nombre de usuario"
+                    placeholder="Enter your username"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                     required
@@ -110,10 +109,10 @@ function Registro() {
                 </Form.Group>
 
                 <Form.Group controlId="formFirstName" className="mb-3">
-                  <Form.Label>Nombre</Form.Label>
+                  <Form.Label>First Name</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu nombre"
+                    placeholder="Enter your first name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
@@ -121,10 +120,10 @@ function Registro() {
                 </Form.Group>
 
                 <Form.Group controlId="formLastName" className="mb-3">
-                  <Form.Label>Apellido</Form.Label>
+                  <Form.Label>Last Name</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu apellido"
+                    placeholder="Enter your last name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
@@ -132,10 +131,10 @@ function Registro() {
                 </Form.Group>
 
                 <Form.Group controlId="formMail" className="mb-3">
-                  <Form.Label>Mail</Form.Label>
+                  <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
-                    placeholder="Ingresa tu mail"
+                    placeholder="Enter your email"
                     value={mail}
                     onChange={(e) => setMail(e.target.value)}
                     required
@@ -143,10 +142,10 @@ function Registro() {
                 </Form.Group>
 
                 <Form.Group controlId="formPassword" className="mb-3">
-                  <Form.Label>Contraseña</Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -154,10 +153,10 @@ function Registro() {
                 </Form.Group>
 
                 <Form.Group controlId="formConfirmPassword" className="mb-3">
-                  <Form.Label>Confirmar Contraseña</Form.Label>
+                  <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
                     type="password"
-                    placeholder="Confirma tu contraseña"
+                    placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -165,7 +164,7 @@ function Registro() {
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100">
-                  Registrarse
+                  Sign Up
                 </Button>
               </Form>
             </Card.Body>
