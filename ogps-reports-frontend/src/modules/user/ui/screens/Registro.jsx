@@ -19,7 +19,27 @@ function Registro() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setMessage("");
+    
+    if (!userName || !mail || !password || !confirmPassword || !firstName || !lastName) {
+      setVariant("danger");
+      setMessage("Credenciales inválidas. No puedes dejar campos vacíos.");
+      return;
+    }
 
+  const emailVal = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailVal.test(mail)) {
+      setVariant("danger");
+      setMessage("Credenciales inválidas. Formato de correo incorrecto.");
+      return;
+  }
+
+  // Validación de caracteres inválidos (Ejemplo: solo letras y números en username)
+  const usernameVal = /^[a-zA-Z0-9_]+$/;
+  if (!usernameVal.test(userName)) {
+    setVariant("danger");
+    setMessage("Credenciales inválidas. Caracteres no permitidos en el nombre de usuario.");
+    return;
+  }
     // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
       setVariant("danger");
@@ -47,9 +67,25 @@ function Registro() {
         }
       })
       .catch((error) => {
+        if (error.response) {
+          switch (error.response.status) {
+            case 400:
+              setMessage("Credenciales inválidas. Formato de correo incorrecto.");
+              break;
+            case 409:
+              setMessage("Credenciales inválidas. Usuario o correo ya registrado o caracteres inválidos.");
+              break;
+            case 422:
+              setMessage("Credenciales inválidas. No puedes dejar campos vacíos.");
+              break;
+            default:
+              setMessage("Error al registrarse. Verifica tus datos.");
+          }
+        } else {
+          console.error("Error al confirmar la solicitud", error.message)
+          setMessage("No se pudo conectar con el servidor.");
+        }
         setVariant("danger");
-        setMessage("Error al registrarse. Verifica tus datos.");
-        console.error("Error en el registro:", error);
       });
   };
 
