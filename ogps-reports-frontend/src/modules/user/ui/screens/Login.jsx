@@ -37,7 +37,7 @@ const LoginForm = () => {
           const { token } = response.data;
           localStorage.setItem("authToken", token);
           setVariant("success");
-          setMessage("Inicio de sesión exitoso");
+          setMessage("Login successful");
           navigate(HOME_PATH);
         }
       })
@@ -82,16 +82,16 @@ const LoginForm = () => {
     <Container>
       <Row className="justify-content-center mt-3">
         <Col className="col-12">
-          <Card className="p-4 shadow ">
+          <Card className="p-4 shadow">
             <Card.Body>
-              <h2 className="text-center">Iniciar Sesión</h2>
+              <h2 className="text-center">Log In</h2>
               {message && <Alert variant={variant}>{message}</Alert>}
               <Form onSubmit={handleLogin}>
                 <Form.Group controlId="formMail" className="mb-3">
-                  <Form.Label>Mail</Form.Label>
+                  <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu mail"
+                    placeholder="Enter your email"
                     value={mail}
                     onChange={(e) => setMail(e.target.value)}
                     required
@@ -99,10 +99,10 @@ const LoginForm = () => {
                 </Form.Group>
 
                 <Form.Group controlId="formPassword" className="mb-3">
-                  <Form.Label>Contraseña</Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -110,7 +110,7 @@ const LoginForm = () => {
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100">
-                  Iniciar Sesión
+                  Log In
                 </Button>
               </Form>
             </Card.Body>
