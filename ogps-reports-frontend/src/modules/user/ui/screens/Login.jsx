@@ -13,8 +13,6 @@ import {
 import { HOME_PATH } from "../../../../navigation/sitePaths";
 import { useNavigate } from "react-router-dom";
 
-
-
 const LoginForm = () => {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,36 +40,36 @@ const LoginForm = () => {
         }
       })
       .catch((error) => {
-          console.error("Error en login:", error);
+          console.error("Error during login:", error);
           let handled = false;
 
           if (error.response) {
               console.error("Error response:", error.response);
               switch (error.response.status) {
                   case 400:
-                      setMessage("Correo con formato inválido.");
+                      setMessage("Invalid email format.");
                       handled = true;
                       break;
-                  case 401: // Nueva condición para credenciales incorrectas
-                      setMessage("Contraseña incorrecta.");
+                  case 401: // New condition for incorrect credentials
+                      setMessage("Incorrect password.");
                       handled = true;
                       break;
                   case 404:
-                      setMessage("Correo no registrado.");
+                      setMessage("Email not registered.");
                       handled = true;
                       break;
                   case 500:
-                      setMessage("Error del servidor.");
+                      setMessage("Server error.");
                       handled = true;
                       break;
               }
           } else if (error.request) {
-              console.error("No hay respuesta del servidor:", error.request);
-              setMessage("No hay respuesta del servidor. Verifica tu conexión.");
+              console.error("No response from server:", error.request);
+              setMessage("No response from server. Please check your connection.");
               handled = true;
           } else {
-              console.error("Error en la configuración de la solicitud:", error.message);
-              setMessage("Error al procesar la solicitud.");
+              console.error("Error in request setup:", error.message);
+              setMessage("Error processing the request.");
               handled = true;
           }
           setVariant("danger");
