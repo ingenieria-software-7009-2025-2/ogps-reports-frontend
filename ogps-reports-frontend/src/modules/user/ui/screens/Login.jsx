@@ -13,8 +13,6 @@ import {
 import { HOME_PATH } from "../../../../navigation/sitePaths";
 import { useNavigate } from "react-router-dom";
 
-
-
 const LoginForm = () => {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,16 +33,15 @@ const LoginForm = () => {
       .then((response) => {
         if (response.status === 200) {
           const { token } = response.data;
-          localStorage.setItem("authToken", token); // Guarda el token en localStorage
+          localStorage.setItem("authToken", token); // Store the token in localStorage
           setVariant("success");
-          setMessage("Inicio de sesión exitoso");
+          setMessage("Login successful");
           navigate(HOME_PATH);
         }
-
       })
       .catch(() => {
         setVariant("danger");
-        setMessage("Error al iniciar sesión. Verifica tus credenciales.");
+        setMessage("Error logging in. Please verify your credentials.");
       });
   };
 
@@ -52,33 +49,33 @@ const LoginForm = () => {
     <Container>
       <Row className="justify-content-center mt-3">
         <Col className="col-12">
-          <Card className="p-4 shadow ">
+          <Card className="p-4 shadow">
             <Card.Body>
-              <h2 className="text-center">Iniciar Sesión</h2>
+              <h2 className="text-center">Log In</h2>
               {message && <Alert variant={variant}>{message}</Alert>}
               <Form onSubmit={handleLogin}>
                 <Form.Group controlId="formMail" className="mb-3">
-                  <Form.Label>Mail</Form.Label>
+                  <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Ingresa tu mail"
+                    placeholder="Enter your email"
                     value={mail}
                     onChange={(e) => setMail(e.target.value)}
                   />
                 </Form.Group>
 
                 <Form.Group controlId="formPassword" className="mb-3">
-                  <Form.Label>Contraseña</Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100">
-                  Iniciar Sesión
+                  Log In
                 </Button>
               </Form>
             </Card.Body>

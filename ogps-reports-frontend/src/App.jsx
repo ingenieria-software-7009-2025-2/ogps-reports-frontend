@@ -6,7 +6,13 @@ import Registro from "./modules/user/ui/screens/Registro";
 import LoginForm from "./modules/user/ui/screens/Login";
 import userApi from "./network/userApi";
 import { useEffect, useState } from "react";
-import { HOME_PATH, REGISTER_PATH, LOGIN_PATH, UPDATE_INFO_PATH, USER_INFO_PATH } from "./navigation/sitePaths";
+import {
+  HOME_PATH,
+  REGISTER_PATH,
+  LOGIN_PATH,
+  UPDATE_INFO_PATH,
+  USER_INFO_PATH,
+} from "./navigation/sitePaths";
 import UpdateInfoForm from "./modules/user/ui/screens/UpdateInfo";
 import UserInfo from "./modules/user/ui/screens/GetInfo";
 
@@ -34,8 +40,8 @@ const App = () => {
       })
       .catch((error) => {
         setVariant("danger");
-        setMessage("Error al cerrar sesión. Intenta de nuevo.");
-        console.error("Error en el logout:", error);
+        setMessage("Error logging out. Please try again.");
+        console.error("Error during logout:", error);
         navigate(`/${LOGIN_PATH}`);
       });
   };
@@ -79,6 +85,15 @@ const App = () => {
                     Logout
                   </Button>
                 </>
+              ) : location.pathname === `/${REGISTER_PATH}` ? (
+                <Button
+                  variant="outline-light"
+                  onClick={() => {
+                    navigate(`/${LOGIN_PATH}`);
+                  }}
+                >
+                  Return to Login
+                </Button>
               ) : (
                 <Button
                   variant="outline-light"

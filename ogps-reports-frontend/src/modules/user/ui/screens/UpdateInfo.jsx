@@ -14,18 +14,15 @@ import { HOME_PATH } from "../../../../navigation/sitePaths";
 import { UPDATE_INFO_PATH } from "../../../../navigation/sitePaths";
 import { useNavigate } from "react-router-dom";
 
-
-
 const UpdateInfoForm = () => {
-  
-    const [userName, setUserName] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");   
-    const [password, setPassword] = useState("");
-    const [mail, setMail] = useState("");
-    const [role, setRole] = useState("");
-    const [message, setMessage] = useState("");
-    const [variant, setVariant] = useState("danger");
+  const [userName, setUserName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
+  const [mail, setMail] = useState("");
+  const [role, setRole] = useState("");
+  const [message, setMessage] = useState("");
+  const [variant, setVariant] = useState("danger");
 
   const navigate = useNavigate();
 
@@ -40,20 +37,18 @@ const UpdateInfoForm = () => {
         lastName: lastName,
         mail: mail,
         password: password,
-        role: "user",
+        role: "User",
       })
       .then((response) => {
         if (response.status === 200) {
-          
           setVariant("success");
-          setMessage("Iformación actualizada exitosamente");
+          setMessage("Information updated successfully");
           navigate(HOME_PATH);
         }
-
       })
       .catch(() => {
         setVariant("danger");
-        setMessage("Error actualizar información.");
+        setMessage("Error updating information.");
       });
   };
 
@@ -61,15 +56,15 @@ const UpdateInfoForm = () => {
     <Container>
       <Card className="mt-5">
         <Card.Body>
-          <h3>Actualizar Información</h3>
-          <h6 className="text-muted">Puedes llenar uno o más campos</h6>
+          <h3>Update Information</h3>
+          <h6 className="text-muted">You can fill one or more fields</h6>
           {message && <Alert variant={variant}>{message}</Alert>}
           <Form onSubmit={handleUpdateInfo}>
             <Form.Group controlId="formUserName">
               <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ingrese su nuevo nombre de usuario"
+                placeholder="Enter your new username"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
               />
@@ -78,7 +73,7 @@ const UpdateInfoForm = () => {
               <Form.Label>First Name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Actualice primer nombre"
+                placeholder="Update your first name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
@@ -87,7 +82,7 @@ const UpdateInfoForm = () => {
               <Form.Label>Last Name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Actualice su apellido"
+                placeholder="Update your last name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
@@ -96,7 +91,7 @@ const UpdateInfoForm = () => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Actualice su correo electrónico"
+                placeholder="Update your email"
                 value={mail}
                 onChange={(e) => setMail(e.target.value)}
               />
@@ -105,13 +100,13 @@ const UpdateInfoForm = () => {
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Ingrese su nueva contraseña"
+                placeholder="Enter your new password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
             <Button variant="primary" type="submit" className="mt-3">
-              Actualizar
+              Update
             </Button>
           </Form>
         </Card.Body>
