@@ -33,15 +33,46 @@ const LoginForm = () => {
       .then((response) => {
         if (response.status === 200) {
           const { token } = response.data;
-          localStorage.setItem("authToken", token); // Store the token in localStorage
+          localStorage.setItem("authToken", token);
           setVariant("success");
           setMessage("Login successful");
           navigate(HOME_PATH);
         }
       })
-      .catch(() => {
-        setVariant("danger");
-        setMessage("Error logging in. Please verify your credentials.");
+      .catch((error) => {
+          console.error("Error during login:", error);
+          let handled = false;
+
+          if (error.response) {
+              console.error("Error response:", error.response);
+              switch (error.response.status) {
+                  case 400:
+                      setMessage("Invalid email format.");
+                      handled = true;
+                      break;
+                  case 401: // New condition for incorrect credentials
+                      setMessage("Incorrect password.");
+                      handled = true;
+                      break;
+                  case 404:
+                      setMessage("Email not registered.");
+                      handled = true;
+                      break;
+                  case 500:
+                      setMessage("Server error.");
+                      handled = true;
+                      break;
+              }
+          } else if (error.request) {
+              console.error("No response from server:", error.request);
+              setMessage("No response from server. Please check your connection.");
+              handled = true;
+          } else {
+              console.error("Error in request setup:", error.message);
+              setMessage("Error processing the request.");
+              handled = true;
+          }
+          setVariant("danger");
       });
   };
 
@@ -61,6 +92,7 @@ const LoginForm = () => {
                     placeholder="Enter your email"
                     value={mail}
                     onChange={(e) => setMail(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
@@ -71,6 +103,7 @@ const LoginForm = () => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
