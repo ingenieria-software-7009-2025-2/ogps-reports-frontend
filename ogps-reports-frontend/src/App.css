@@ -1,42 +1,71 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.App {
+  width: 100vw; /* Ocupa todo el ancho del viewport */
+  height: 100vh; /* Ocupa toda la altura del viewport */
+  margin: 0;
+  padding: 0;
   text-align: center;
+  background-color: #f0f0f0; /* Fondo para toda la pantalla */
+  display: flex;
+  flex-direction: column;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.content {
+  flex: 1; /* Ocupa el espacio restante */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem; /* Agrega un poco de padding para pantallas pequeñas */
 }
 
-@keyframes logo-spin {
+/* Ajustes para pantallas medianas y pequeñas */
+@media (max-width: 768px) {
+  .content {
+    padding: 0.5rem; /* Reduce el padding en pantallas pequeñas */
+    align-items: flex-start; /* Alinea el contenido al inicio en pantallas pequeñas */
+    margin-top: 1rem; /* Asegura que no se superponga con el Navbar */
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .content {
+    padding: 0.25rem; /* Reduce aún más el padding */
+    margin-top: 0.5rem; /* Reduce el margen superior */
+  }
+}
+
+/* Mantén el resto de los estilos */
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
