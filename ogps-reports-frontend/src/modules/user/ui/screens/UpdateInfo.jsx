@@ -27,30 +27,84 @@ const UpdateInfoForm = () => {
   const navigate = useNavigate();
 
   const handleUpdateInfo = (event) => {
-    event.preventDefault();
-    setMessage("");
+      event.preventDefault();
+      setMessage("");
 
-    userApi
-      .updateInfo({
-        userName: userName,
-        firstName: firstName,
-        lastName: lastName,
-        mail: mail,
-        password: password,
-        role: "User",
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          setVariant("success");
-          setMessage("Information updated successfully");
-          navigate(HOME_PATH);
-        }
-      })
-      .catch(() => {
-        setVariant("danger");
-        setMessage("Error updating information.");
-      });
+      // Validaciones de formato previas al envío
+      const userNameRegex = /^[a-zA-Z0-9._-]{3,}$/;
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.com$/;
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      const nameRegex = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ]{2,}$/;
+
+      const validateField = (field, regex, errorMessage) => {
+          if (field && !regex.test(field)) {
+              setMessage(errorMessage);
+              setVariant("danger");
+              return false;
+          }
+          return true;
+      };
+
+      if (
+          !validateField(
+              userName.trim(),
+              userNameRegex,
+              "Invalid username format, must be at least 3 characters and can only contain letters, numbers, hyphens, or periods"
+          ) ||
+          !validateField(
+              mail.trim(),
+              emailRegex,
+              "Invalid email format, only gmail, outlook, and hotmail domains are accepted"
+          ) ||
+          !validateField(
+              password.trim(),
+              passwordRegex,
+              "Weak password, must contain at least 1 uppercase letter, 1 number, 1 special character, and be at least 8 characters long"
+          ) ||
+          !validateField(
+              firstName.trim(),
+              nameRegex,
+              "Invalid first name, use at least 2 letters and no special characters"
+          ) ||
+          !validateField(
+              lastName.trim(),
+              nameRegex,
+              "Invalid last name, use at least 2 letters and no special characters"
+          )
+      ) {
+          return;
+      }
+
+      // Send request to the update API
+      userApi
+          .updateInfo({
+              userName: userName.trim(),
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              mail: mail.trim(),
+              password: password.trim(),
+              role: "User",
+          })
+          .then((response) => {
+              setVariant("success");
+              setMessage("Information updated successfully");
+              navigate(HOME_PATH);
+          })
+          .catch((error) => {
+              console.error("Update error:", error);
+              let errorMsg = "Unknown error. Please try again.";
+
+              if (error.response) {
+                  errorMsg = error.response.data || "Error without description";
+              } else if (error.request) {
+                  errorMsg = "No response from the server. Please check your connection";
+              }
+
+              setMessage(errorMsg);
+              setVariant("danger");
+          });
   };
+
 
   return (
     <Container>
