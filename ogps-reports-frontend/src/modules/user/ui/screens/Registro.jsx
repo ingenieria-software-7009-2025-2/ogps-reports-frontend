@@ -90,16 +90,15 @@ function Registro() {
         }
       })
       .catch((error) => {
+          console.error("Error en registro: ", error)
         if (error.response) {
+            console.error("Error response: ", error.response)
           switch (error.response.status) {
             case 400:
-              setMessage("Wrong format for mail.");
+              setMessage("Wrong format for First name and Last name.");
               break;
             case 409:
-              setMessage("Username or mail already in use or wrond characters.");
-              break;
-            case 422:
-              setMessage("You have to fill all the blank spaces.");
+              setMessage("Username or mail already in use.");
               break;
             default:
               setMessage("Error with information, try again.");
