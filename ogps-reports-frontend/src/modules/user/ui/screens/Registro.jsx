@@ -95,7 +95,7 @@ function Registro() {
             console.error("Error response: ", error.response)
           switch (error.response.status) {
             case 400:
-              setMessage("Wrong format for First name and Last name.");
+              setMessage("Invalid format for first name and last name, invalid format for password or invalid domain for mail .");
               break;
             case 409:
               setMessage("Username or mail already in use.");
