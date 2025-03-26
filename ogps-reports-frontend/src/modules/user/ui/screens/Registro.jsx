@@ -16,11 +16,54 @@ function Registro() {
 
   const navigate = useNavigate();
 
+  const checkUsernameAvailability = async (username) => {
+      try {
+        const response = await userApi.checkUsername(username);
+        setUsernameAvailable(response.data.available); // Suponiendo que el backend devuelve { available: true/false }
+      } catch (error) {
+        setUsernameAvailable(false);
+        setMessage("Error checking username availability.");
+        setVariant("danger");
+      }
+    };
+
+    // Función para verificar disponibilidad de correo
+    const checkEmailAvailability = async (email) => {
+      try {
+        const response = await userApi.checkEmail(email);
+        setEmailAvailable(response.data.available); // Suponiendo que el backend devuelve { available: true/false }
+      } catch (error) {
+        setEmailAvailable(false);
+        setMessage("Error checking email availability.");
+        setVariant("danger");
+      }
+    };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     setMessage("");
 
-    // Validate that passwords match
+    if (!userName || !mail || !password || !confirmPassword || !firstName || !lastName) {
+      setVariant("danger");
+      setMessage("You have to fill all the blank spaces.");
+      return;
+    }
+
+  const emailVal = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailVal.test(mail)) {
+      setVariant("danger");
+      setMessage("Incorrect format for mail.");
+      return;
+  }
+
+  const usernameVal = /^[a-zA-Z0-9_]+$/;
+  if (!usernameVal.test(userName)) {
+    setVariant("danger");
+    setMessage("Incoreect credentials. Wrong characters for username.");
+    return;
+  }
+
+    // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
       setVariant("danger");
       setMessage("Passwords do not match.");
@@ -47,9 +90,24 @@ function Registro() {
         }
       })
       .catch((error) => {
+          console.error("Error en registro: ", error)
+        if (error.response) {
+            console.error("Error response: ", error.response)
+          switch (error.response.status) {
+            case 400:
+              setMessage("Wrong format for First name and Last name.");
+              break;
+            case 409:
+              setMessage("Username or mail already in use.");
+              break;
+            default:
+              setMessage("Error with information, try again.");
+          }
+        } else {
+          console.error("Error while confirming the request.", error.message)
+          setMessage("Couldn't connect to the server.");
+        }
         setVariant("danger");
-        setMessage("Error registering. Please verify your details.");
-        console.error("Registration error:", error);
       });
   };
 

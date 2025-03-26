@@ -38,6 +38,12 @@ const userApi = {
       headers: { Authorization: `${token}` },
     });
   },
+  checkUsername: (username) => {
+      return userApiInstance.get(`/users/check-username?username=${username}`);
+    },
+    checkEmail: (email) => {
+      return userApiInstance.get(`/users/check-email?email=${email}`);
+    },
 };
 
 export default userApi;
