@@ -3,18 +3,27 @@
   height: 100vh; /* Ocupa toda la altura del viewport */
   margin: 0;
   padding: 0;
-  text-align: center;
-  background-color: #f0f0f0; /* Fondo para toda la pantalla */
   display: flex;
   flex-direction: column;
+  background-color: #f0f0f0; /* Fondo para toda la pantalla */
+}
+
+.App .navbar {
+  flex-shrink: 0; /* Evita que el Navbar se encoja */
+}
+
+.message-container {
+  flex-shrink: 0; /* Evita que el contenedor del mensaje se encoja */
+  padding: 0 1rem; /* Ajusta el padding para que coincida con el contenido */
 }
 
 .content {
   flex: 1; /* Ocupa el espacio restante */
+  overflow-y: auto; /* Permite scroll vertical cuando el contenido excede el tamaño */
+  padding: 1rem; /* Agrega un poco de padding para pantallas pequeñas */
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 1rem; /* Agrega un poco de padding para pantallas pequeñas */
+  align-items: flex-start; /* Alinea el contenido al inicio */
 }
 
 /* Ajustes para pantallas medianas y pequeñas */
@@ -22,7 +31,6 @@
   .content {
     padding: 0.5rem; /* Reduce el padding en pantallas pequeñas */
     align-items: flex-start; /* Alinea el contenido al inicio en pantallas pequeñas */
-    margin-top: 1rem; /* Asegura que no se superponga con el Navbar */
   }
 }
 
@@ -30,7 +38,6 @@
 @media (max-width: 576px) {
   .content {
     padding: 0.25rem; /* Reduce aún más el padding */
-    margin-top: 0.5rem; /* Reduce el margen superior */
   }
 }
 

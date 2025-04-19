@@ -110,7 +110,7 @@ const App = () => {
       </Navbar>
 
       {message && (
-        <Container className="mt-3">
+        <Container className="mt-3 message-container">
           <Alert variant={variant}>{message}</Alert>
         </Container>
       )}
