@@ -1,6 +1,7 @@
 import { Card, Container, Stack, Button, Form, Row, Col, Alert, Image } from "react-bootstrap";
 import { useState } from "react";
 import userApi from "../../../../network/userApi";
+import { useEffect } from "react";
 
 function Inicio() {
   const [showForm, setShowForm] = useState(false);
@@ -123,6 +124,19 @@ function Inicio() {
       });
   };
 
+  // Inicializar el mapa 
+  useEffect(() => {
+    if (!window.google) {
+      console.error("Google Maps no ha cargado aún.");
+      return;
+    }
+  
+    const map = new window.google.maps.Map(document.getElementById("map"), {
+      center: { lat: 19.4326, lng: -99.1332 }, // Cambia a tu ciudad base
+      zoom: 12,
+    });
+  }, []);
+
   return (
     <Container fluid className="pt-3">
       <Row>
@@ -130,7 +144,9 @@ function Inicio() {
         <Col lg={8}>
           <Card bg="light" className="mb-3">
             <Card.Title>Map</Card.Title>
-            <Card.Body>Map placeholder</Card.Body>
+            <Card.Body>
+              <div id="map" style={{ height: "500px", width: "100%" }}></div>
+            </Card.Body>
           </Card>
         </Col>
 
