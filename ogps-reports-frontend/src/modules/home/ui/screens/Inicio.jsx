@@ -1,4 +1,4 @@
-import { Card, Container, Stack, Button, Form, Row, Col, Alert } from "react-bootstrap";
+import { Card, Container, Stack, Button, Form, Row, Col, Alert, Image } from "react-bootstrap";
 import { useState } from "react";
 import userApi from "../../../../network/userApi";
 
@@ -12,9 +12,9 @@ function Inicio() {
   const [longitude, setLongitude] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [description, setDescription] = useState("");
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState([]); // Array de archivos de imágenes
+  const [photoPreviews, setPhotoPreviews] = useState([]); // Array de URLs para vista previa
 
-  // Categorías válidas según tu backend
   const categories = [
     "Potholes and Defects",
     "Street Lighting",
@@ -23,16 +23,76 @@ function Inicio() {
     "Other",
   ];
 
+  // Obtener la fecha actual en formato YYYY-MM-DD
+  const today = new Date();
+  const maxDate = today.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+
+  // Manejar la selección de imágenes
+  const handlePhotoChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setPhotos(selectedFiles);
+
+    // Generar URLs para la vista previa
+    const previews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setPhotoPreviews(previews);
+  };
+
+  // Eliminar una imagen de la lista
+  const handleRemovePhoto = (index) => {
+    const updatedPhotos = photos.filter((_, i) => i !== index);
+    const updatedPreviews = photoPreviews.filter((_, i) => i !== index);
+
+    // Liberar las URLs de vista previa para evitar fugas de memoria
+    photoPreviews.forEach((preview, i) => {
+      if (i === index) {
+        URL.revokeObjectURL(preview);
+      }
+    });
+
+    setPhotos(updatedPhotos);
+    setPhotoPreviews(updatedPreviews);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setMessage(""); // Limpiar mensajes previos
 
+    const lat = parseFloat(latitude);
+    const lon = parseFloat(longitude);
+
+    // Validación de latitud y longitud
+    if (isNaN(lat) || lat < -90 || lat > 90) {
+      setVariant("danger");
+      setMessage("Latitude must be a number between -90 and 90");
+      return;
+    }
+    if (isNaN(lon) || lon < -180 || lon > 180) {
+      setVariant("danger");
+      setMessage("Longitude must be a number between -180 and 180");
+      return;
+    }
+
+    // Validación de que se haya seleccionado al menos una foto
+    if (photos.length === 0) {
+      setVariant("danger");
+      setMessage("At least one photo is required");
+      return;
+    }
+
+    // Validación de la fecha: no puede ser posterior a la fecha actual
+    const selectedDate = new Date(reportDate);
+    if (selectedDate > today) {
+      setVariant("danger");
+      setMessage("Report date cannot be in the future");
+      return;
+    }
+
     const incidentData = {
       category,
       title,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      reportDate: new Date(reportDate),
+      latitude: lat,
+      longitude: lon,
+      reportDate: selectedDate,
       description,
     };
 
@@ -50,6 +110,9 @@ function Inicio() {
         setReportDate("");
         setDescription("");
         setPhotos([]);
+        setPhotoPreviews([]);
+        // Liberar todas las URLs de vista previa
+        photoPreviews.forEach((preview) => URL.revokeObjectURL(preview));
       })
       .catch((error) => {
         setVariant("danger");
@@ -75,13 +138,10 @@ function Inicio() {
         <Col lg={4}>
           <Stack gap={2}>
             <Button variant="dark" disabled>
-              Incidentes reportados
+              Reported Incidents
             </Button>
-            <Button
-              variant="dark"
-              onClick={() => setShowForm(!showForm)}
-            >
-              Registrar nuevo incidente
+            <Button variant="dark" onClick={() => setShowForm(!showForm)}>
+              Register New Incident
             </Button>
 
             {showForm && (
@@ -142,6 +202,7 @@ function Inicio() {
                       type="date"
                       value={reportDate}
                       onChange={(e) => setReportDate(e.target.value)}
+                      max={maxDate}
                       required
                     />
                   </Form.Group>
@@ -157,14 +218,43 @@ function Inicio() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Attach evidence</Form.Label>
+                    <Form.Label>Attach evidence (at least one photo required)</Form.Label>
                     <Form.Control
                       type="file"
                       multiple
-                      onChange={(e) => setPhotos(Array.from(e.target.files))}
+                      onChange={handlePhotoChange}
                       accept="image/*"
+                      required
                     />
                   </Form.Group>
+
+                  {/* Vista previa de las imágenes seleccionadas */}
+                  {photoPreviews.length > 0 && (
+                    <div className="mb-3">
+                      <h6>Selected Images:</h6>
+                      <Row>
+                        {photoPreviews.map((preview, index) => (
+                          <Col xs={6} md={4} key={index} className="mb-2">
+                            <div className="position-relative">
+                              <Image
+                                src={preview}
+                                thumbnail
+                                style={{ maxWidth: "100px", maxHeight: "100px" }}
+                              />
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                className="position-absolute top-0 end-0"
+                                onClick={() => handleRemovePhoto(index)}
+                              >
+                                X
+                              </Button>
+                            </div>
+                          </Col>
+                        ))}
+                      </Row>
+                    </div>
+                  )}
 
                   <Button variant="primary" type="submit">
                     Create
