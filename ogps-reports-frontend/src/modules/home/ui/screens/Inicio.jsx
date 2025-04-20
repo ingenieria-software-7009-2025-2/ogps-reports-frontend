@@ -132,8 +132,32 @@ function Inicio() {
     }
   
     const map = new window.google.maps.Map(document.getElementById("map"), {
-      center: { lat: 19.4326, lng: -99.1332 }, // Cambia a tu ciudad base
+      center: { lat: 19.4326, lng: -99.1332 },
       zoom: 12,
+    });
+  
+    let marker = null;
+  
+    // Evento cuando el usuario hace clic en el mapa
+    map.addListener("click", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+  
+      // Si ya hay un marcador, lo movemos
+      if (marker) {
+        marker.setPosition({ lat, lng });
+      } else {
+        // Si no hay marcador, creamos uno nuevo
+        marker = new window.google.maps.Marker({
+          position: { lat, lng },
+          map: map,
+          draggable: false,
+        });
+      }
+  
+      // Actualizar los campos de lat/lng del formulario
+      setLatitude(lat.toFixed(6));   // 6 decimales como estándar
+      setLongitude(lng.toFixed(6));
     });
   }, []);
 
