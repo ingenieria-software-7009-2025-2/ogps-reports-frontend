@@ -56,11 +56,11 @@ const userApi = {
     const token = localStorage.getItem("authToken");
     const formData = new FormData();
     formData.append("incident", JSON.stringify(incidentData));
-    console.log("Incident data being sent:", incidentData); // Log para depurar
+    console.log("Incident data being sent:", incidentData);
     if (photos && photos.length > 0) {
       photos.forEach((photo, index) => {
         formData.append("photos", photo);
-        console.log(`Photo ${index}:`, photo.name, photo.size, photo.type); // Log para depurar
+        console.log(`Photo ${index}:`, photo.name, photo.size, photo.type);
       });
     } else {
       console.log("No photos attached");
@@ -69,6 +69,24 @@ const userApi = {
     return userApiInstance.post("/incidents", formData, {
       headers: {
         Authorization: `${token}`,
+      },
+    });
+  },
+  getReportedIncidents: () => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.get("/incidents/my-reports", {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
+  deleteIncident: (incidentId) => {
+    const token = localStorage.getItem("authToken");
+    return userApiInstance.delete(`/incidents/${incidentId}`, {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
       },
     });
   },

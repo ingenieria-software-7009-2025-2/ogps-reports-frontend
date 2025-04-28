@@ -4,6 +4,7 @@ import { Container, Nav, Navbar, Button, Alert } from "react-bootstrap";
 import Inicio from "./modules/home/ui/screens/Inicio";
 import Registro from "./modules/user/ui/screens/Registro";
 import LoginForm from "./modules/user/ui/screens/Login";
+import IncidentDetails from "./modules/home/ui/screens/IncidentDetails";
 import userApi from "./network/userApi";
 import { useEffect, useState } from "react";
 import {
@@ -12,6 +13,7 @@ import {
   LOGIN_PATH,
   UPDATE_INFO_PATH,
   USER_INFO_PATH,
+  INCIDENT_DETAILS_PATH,
 } from "./navigation/sitePaths";
 import UpdateInfoForm from "./modules/user/ui/screens/UpdateInfo";
 import UserInfo from "./modules/user/ui/screens/GetInfo";
@@ -122,6 +124,7 @@ const App = () => {
           <Route path={LOGIN_PATH} element={<LoginForm />} />
           <Route path={UPDATE_INFO_PATH} element={<UpdateInfoForm />} />
           <Route path={USER_INFO_PATH} element={<UserInfo />} />
+          <Route path={`${INCIDENT_DETAILS_PATH}/:id`} element={<IncidentDetails />} />
         </Routes>
       </div>
     </div>
