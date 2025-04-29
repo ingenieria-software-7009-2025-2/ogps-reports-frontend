@@ -287,6 +287,11 @@ function Inicio() {
       marcador.addListener("click", () => {
         infoWindow.open(mapa, marcador);
       });
+
+      // Evento de doble clic para ver los detalles completos
+      marcador.addListener("dblclick", () => {
+        handleViewDetails(incidente);
+      });
     });
   }
 
