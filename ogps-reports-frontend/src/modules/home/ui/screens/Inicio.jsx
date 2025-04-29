@@ -15,7 +15,17 @@ function Inicio() {
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState([]); // Array de archivos de imágenes
   const [photoPreviews, setPhotoPreviews] = useState([]); // Array de URLs para vista previa
-
+  const marcadores = [{
+      id: 1,
+      title: "Bache en la calle",
+      latitude: 19.4336,
+      longitude: -99,1342,
+      category: "Potholes",
+      description: "Bache profundo en la esquina de la calle",
+      status: "Pendiente",
+      reportDate: "2025-04-20"
+      }
+      ]
   const categories = [
     "Potholes and Defects",
     "Street Lighting",
@@ -130,10 +140,21 @@ function Inicio() {
       console.error("Google Maps no ha cargado aún.");
       return;
     }
+
+    function agregarMarcadores(mapa, incidentes) {
+        incidentes.forEach(incidente =>{
+            var marcador = new google.maps.Marker({
+                posicion = {latitud: incidente.latitud, longitud: incidente.longitud},}
+                mapa: mapa,
+                });
+            }
+            );
+        }
   
     const map = new window.google.maps.Map(document.getElementById("map"), {
       center: { lat: 19.4326, lng: -99.1332 },
       zoom: 12,
+      agregarMarcadores(mapa, incidentes);
     });
   
     let marker = null;
