@@ -170,6 +170,8 @@ function Inicio() {
       zoom: 12,
 
     });
+
+    agregarMarcadores(map, marcadores);
   
     let marker = null;
   
