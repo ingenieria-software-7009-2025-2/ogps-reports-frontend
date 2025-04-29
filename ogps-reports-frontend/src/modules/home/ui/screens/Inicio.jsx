@@ -149,7 +149,21 @@ function Inicio() {
                 });
             }
             );
+        const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <div>
+                  <strong>Tipo:</strong> ${incidente.tipo}<br/>
+                  <strong>Estado:</strong> ${incidente.estado}
+                </div>
+              `
+            });
+
+            marcador.addListener("click", () => {
+              infoWindow.open(mapa, marcador);
+            });
+          });
         }
+
   
     const map = new window.google.maps.Map(document.getElementById("map"), {
       center: { lat: 19.4326, lng: -99.1332 },
