@@ -144,8 +144,9 @@ function Inicio() {
     function agregarMarcadores(mapa, incidentes) {
         incidentes.forEach(incidente =>{
             const marcador = new google.maps.Marker({
-                posicion: {lat: incidente.latitude, lng: incidente.longitude},}
+                posicion: {lat: incidente.latitude, lng: incidente.longitude},
                 mapa: mapa,
+                }
                 )};
             )};
 
@@ -346,6 +347,7 @@ function Inicio() {
       </Row>
     </Container>
   );
+
 }
 
 export default Inicio;
