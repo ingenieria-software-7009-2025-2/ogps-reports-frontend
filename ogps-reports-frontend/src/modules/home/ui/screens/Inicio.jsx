@@ -19,7 +19,7 @@ function Inicio() {
       id: 1,
       title: "Bache en la calle",
       latitude: 19.4336,
-      longitude: -99,1342,
+      longitude: -99.1342,
       category: "Potholes",
       description: "Bache profundo en la esquina de la calle",
       status: "Pendiente",
