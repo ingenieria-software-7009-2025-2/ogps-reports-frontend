@@ -20,6 +20,20 @@ function Inicio() {
   const [incidents, setIncidents] = useState([]);
   const [showIncidents, setShowIncidents] = useState(false);
 
+  const [nearbyIncidents, setNearbyIncidents] = useState([]); // Estado para almacenar incidentes cercanos
+  const [userLocation, setUserLocation] = useState(null); // Almacenar la ubicación del usuario
+  const [searchRadius, setSearchRadius] = useState(5.0); // Radio de búsqueda en kilómetros
+  const marcadores = [{
+      id: 1,
+      title: "Bache en la calle",
+      latitude: 19.4336,
+      longitude: -99.1342,
+      category: "Potholes",
+      description: "Bache profundo en la esquina de la calle",
+      status: "Pendiente",
+      reportDate: "2025-04-20"
+      }
+      ]
   const categories = [
     "Potholes and Defects",
     "Street Lighting",
@@ -61,6 +75,83 @@ function Inicio() {
     });
     setPhotos(updatedPhotos);
     setPhotoPreviews(updatedPreviews);
+  };
+
+  // Función para cargar incidentes cercanos
+  const loadNearbyIncidents = (lat, lng, radius) => {
+    userApi.getNearbyIncidents(lat, lng, radius)
+      .then(response => {
+        setNearbyIncidents(response.data);
+        setVariant("success");
+        setMessage(`Loaded ${response.data.length} nearby incidents`);
+        
+        // Actualizar marcadores en el mapa
+        if (window.google && window.map) {
+          // Limpiamos los marcadores existentes (excepto el de ubicación del usuario)
+          agregarMarcadores(window.map, response.data);
+        }
+      })
+      .catch(error => {
+        setVariant("danger");
+        setMessage("Error loading nearby incidents: " + 
+          (error.response?.data?.message || error.message));
+      });
+  };
+
+  // Función para obtener la ubicación actual del usuario
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserLocation({ lat, lng });
+          setLatitude(lat.toFixed(6));
+          setLongitude(lng.toFixed(6));
+          
+          // Cargar incidentes cercanos a la ubicación actual
+          loadNearbyIncidents(lat, lng, searchRadius);
+          
+          // Centrar el mapa en la ubicación actual
+          if (window.map) {
+            window.map.setCenter({ lat, lng });
+            
+            // Agregar marcador para la ubicación del usuario
+            new window.google.maps.Marker({
+              position: { lat, lng },
+              map: window.map,
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 7,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#FFFFFF",
+                strokeWeight: 2,
+              },
+              title: "Your Location"
+            });
+          }
+        },
+        (error) => {
+          setVariant("warning");
+          setMessage("Error obtaining location: " + error.message);
+        }
+      );
+    } else {
+      setVariant("warning");
+      setMessage("Geolocation is not supported by this browser");
+    }
+  };
+
+  // Manejar cambio de radio de búsqueda
+  const handleRadiusChange = (e) => {
+    const newRadius = parseFloat(e.target.value);
+    setSearchRadius(newRadius);
+    
+    // Si tenemos la ubicación del usuario, actualizar la búsqueda
+    if (userLocation) {
+      loadNearbyIncidents(userLocation.lat, userLocation.lng, newRadius);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -120,6 +211,11 @@ function Inicio() {
         photoPreviews.forEach((preview) => URL.revokeObjectURL(preview));
         // Refresh the incidents list
         userApi.getReportedIncidents().then((res) => setIncidents(res.data));
+        
+        // Recargar incidentes cercanos si tenemos la ubicación del usuario
+        if (userLocation) {
+          loadNearbyIncidents(userLocation.lat, userLocation.lng, searchRadius);
+        }
       })
       .catch((error) => {
         setVariant("danger");
@@ -158,18 +254,122 @@ function Inicio() {
       navigate(`${INCIDENT_DETAILS_PATH}/${incident.idIncident}`, { state: { incident } });
   };
 
+  // Función para agregar marcadores al mapa
+  function agregarMarcadores(mapa, incidentes) {
+    // Limpiar marcadores existentes (excepto el de ubicación)
+    if (window.markers) {
+      window.markers.forEach(marker => marker.setMap(null));
+    }
+    
+    // Array para almacenar los nuevos marcadores
+    window.markers = [];
+    
+    incidentes.forEach((incidente) => {
+      const marcador = new google.maps.Marker({
+        position: { lat: incidente.latitude, lng: incidente.longitude },
+        map: mapa,
+      });
+      
+      window.markers.push(marcador);
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div>
+            <strong>Title:</strong> ${incidente.title || 'No title'}<br/>
+            <strong>Category:</strong> ${incidente.category}<br/>
+            <strong>Status:</strong> ${incidente.status || 'Pending'}<br/>
+            <strong>Date:</strong> ${new Date(incidente.reportDate).toLocaleDateString()}<br/>
+            ${incidente.description ? `<strong>Description:</strong> ${incidente.description}` : ''}
+          </div>
+        `
+      });
+
+      marcador.addListener("click", () => {
+        infoWindow.open(mapa, marcador);
+      });
+    });
+  }
+
+  // Inicializar el mapa 
+  useEffect(() => {
+    if (!window.google) {
+      console.error("Google Maps no ha cargado aún.");
+      return;
+    }
+
+    const map = new window.google.maps.Map(document.getElementById("map"), {
+      center: { lat: 19.4326, lng: -99.1332 },
+      zoom: 12,
+    });
+    
+    // Guardar el mapa en una variable global para acceder a él en otras funciones
+    window.map = map;
+    window.markers = [];
+
+    // Inicialmente agregar los marcadores existentes
+    agregarMarcadores(map, marcadores);
+  
+    let marker = null;
+  
+    // Evento cuando el usuario hace clic en el mapa
+    map.addListener("click", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+  
+      // Si ya hay un marcador, lo movemos
+      if (marker) {
+        marker.setPosition({ lat, lng });
+      } else {
+        // Si no hay marcador, creamos uno nuevo
+        marker = new window.google.maps.Marker({
+          position: { lat, lng },
+          map: map,
+          draggable: false,
+        });
+      }
+  
+      // Actualizar los campos de lat/lng del formulario
+      setLatitude(lat.toFixed(6));   // 6 decimales como estándar
+      setLongitude(lng.toFixed(6));
+      
+      // Cargar incidentes cercanos a la posición clickeada
+      loadNearbyIncidents(lat, lng, searchRadius);
+    });
+    
+    // Intentar obtener la ubicación actual del usuario
+    getCurrentLocation();
+  }, []);
 
   return (
-      <Container fluid className="pt-3">
-        <Row>
-          <Col lg={8}>
-            <Card bg="light" className="mb-3">
-              <Card.Title>Map</Card.Title>
-              <Card.Body>Map placeholder</Card.Body>
-            </Card>
-          </Col>
+    <Container fluid className="pt-3">
+      <Row>     
+              
+        {/* Área del mapa */}
+        <Col lg={8}>
+          <Card bg="light" className="mb-3">
+            <Card.Title>Map</Card.Title>
+            <Card.Body>
+              <div id="map" style={{ height: "500px", width: "100%" }}></div>
+              <div className="mt-2">
+                <Button variant="info" onClick={getCurrentLocation} className="me-2">
+                  Get My Location
+                </Button>
+                <Form.Label className="me-2">Search Radius (km):</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0.5"
+                  max="20"
+                  step="0.5"
+                  value={searchRadius}
+                  onChange={handleRadiusChange}
+                  style={{ width: "100px", display: "inline-block" }}
+                />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
 
-          <Col lg={4}>
+        <Col lg={4}>
             <Stack gap={2}>
               <Button variant="dark" onClick={() => setShowIncidents(!showIncidents)}>
                 Reported Incidents
@@ -342,8 +542,8 @@ function Inicio() {
                   {message}
                 </Alert>
               )}
-            </Stack>
-          </Col>
+              </Stack>
+            </Col>
         </Row>
       </Container>
     );

@@ -90,6 +90,27 @@ const userApi = {
       },
     });
   },
+  getAllIncidents: () => {
+    const token = localStorage.getItem('authToken');
+    return userApiInstance.get("/incidents/all", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  },
+  getNearbyIncidents: (latitude, longitude, radius = 5.0) => {
+    const token = localStorage.getItem('authToken');
+    return userApiInstance.get("/incidents/nearby", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        latitude,
+        longitude,
+        radius
+      }
+    });
+  },
 };
 
 export default userApi;
