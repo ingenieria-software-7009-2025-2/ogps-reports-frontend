@@ -146,23 +146,21 @@ function Inicio() {
             const marcador = new google.maps.Marker({
                 posicion: {lat: incidente.latitude, lng: incidente.longitude},}
                 mapa: mapa,
-                });
-            }
-            );
-        const infoWindow = new google.maps.InfoWindow({
-              content: `
-                <div>
+                )};
+            )};
+
+    const infoWindow = new google.maps.InfoWindow({
+        content: `
+               <div>
                   <strong>Tipo:</strong> ${incidente.tipo}<br/>
                   <strong>Estado:</strong> ${incidente.estado}
-                </div>
+               </div>
               `
             });
 
             marcador.addListener("click", () => {
               infoWindow.open(mapa, marcador);
             });
-          });
-        }
 
   
     const map = new window.google.maps.Map(document.getElementById("map"), {
