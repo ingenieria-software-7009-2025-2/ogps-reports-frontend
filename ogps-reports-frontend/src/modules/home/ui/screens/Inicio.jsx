@@ -15,7 +15,10 @@ function Inicio() {
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState([]); // Array de archivos de imágenes
   const [photoPreviews, setPhotoPreviews] = useState([]); // Array de URLs para vista previa
-  const incidentes = [{
+  const [nearbyIncidents, setNearbyIncidents] = useState([]); // Estado para almacenar incidentes cercanos
+  const [userLocation, setUserLocation] = useState(null); // Almacenar la ubicación del usuario
+  const [searchRadius, setSearchRadius] = useState(5.0); // Radio de búsqueda en kilómetros
+  const marcadores = [{
       id: 1,
       title: "Bache en la calle",
       latitude: 19.4336,
@@ -62,6 +65,83 @@ function Inicio() {
 
     setPhotos(updatedPhotos);
     setPhotoPreviews(updatedPreviews);
+  };
+
+  // Función para cargar incidentes cercanos
+  const loadNearbyIncidents = (lat, lng, radius) => {
+    userApi.getNearbyIncidents(lat, lng, radius)
+      .then(response => {
+        setNearbyIncidents(response.data);
+        setVariant("success");
+        setMessage(`Loaded ${response.data.length} nearby incidents`);
+        
+        // Actualizar marcadores en el mapa
+        if (window.google && window.map) {
+          // Limpiamos los marcadores existentes (excepto el de ubicación del usuario)
+          agregarMarcadores(window.map, response.data);
+        }
+      })
+      .catch(error => {
+        setVariant("danger");
+        setMessage("Error loading nearby incidents: " + 
+          (error.response?.data?.message || error.message));
+      });
+  };
+
+  // Función para obtener la ubicación actual del usuario
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserLocation({ lat, lng });
+          setLatitude(lat.toFixed(6));
+          setLongitude(lng.toFixed(6));
+          
+          // Cargar incidentes cercanos a la ubicación actual
+          loadNearbyIncidents(lat, lng, searchRadius);
+          
+          // Centrar el mapa en la ubicación actual
+          if (window.map) {
+            window.map.setCenter({ lat, lng });
+            
+            // Agregar marcador para la ubicación del usuario
+            new window.google.maps.Marker({
+              position: { lat, lng },
+              map: window.map,
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 7,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#FFFFFF",
+                strokeWeight: 2,
+              },
+              title: "Your Location"
+            });
+          }
+        },
+        (error) => {
+          setVariant("warning");
+          setMessage("Error obtaining location: " + error.message);
+        }
+      );
+    } else {
+      setVariant("warning");
+      setMessage("Geolocation is not supported by this browser");
+    }
+  };
+
+  // Manejar cambio de radio de búsqueda
+  const handleRadiusChange = (e) => {
+    const newRadius = parseFloat(e.target.value);
+    setSearchRadius(newRadius);
+    
+    // Si tenemos la ubicación del usuario, actualizar la búsqueda
+    if (userLocation) {
+      loadNearbyIncidents(userLocation.lat, userLocation.lng, newRadius);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -124,6 +204,11 @@ function Inicio() {
         setPhotoPreviews([]);
         // Liberar todas las URLs de vista previa
         photoPreviews.forEach((preview) => URL.revokeObjectURL(preview));
+        
+        // Recargar incidentes cercanos si tenemos la ubicación del usuario
+        if (userLocation) {
+          loadNearbyIncidents(userLocation.lat, userLocation.lng, searchRadius);
+        }
       })
       .catch((error) => {
         setVariant("danger");
@@ -134,6 +219,42 @@ function Inicio() {
       });
   };
 
+  // Función para agregar marcadores al mapa
+  function agregarMarcadores(mapa, incidentes) {
+    // Limpiar marcadores existentes (excepto el de ubicación)
+    if (window.markers) {
+      window.markers.forEach(marker => marker.setMap(null));
+    }
+    
+    // Array para almacenar los nuevos marcadores
+    window.markers = [];
+    
+    incidentes.forEach((incidente) => {
+      const marcador = new google.maps.Marker({
+        position: { lat: incidente.latitude, lng: incidente.longitude },
+        map: mapa,
+      });
+      
+      window.markers.push(marcador);
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div>
+            <strong>Title:</strong> ${incidente.title || 'No title'}<br/>
+            <strong>Category:</strong> ${incidente.category}<br/>
+            <strong>Status:</strong> ${incidente.status || 'Pending'}<br/>
+            <strong>Date:</strong> ${new Date(incidente.reportDate).toLocaleDateString()}<br/>
+            ${incidente.description ? `<strong>Description:</strong> ${incidente.description}` : ''}
+          </div>
+        `
+      });
+
+      marcador.addListener("click", () => {
+        infoWindow.open(mapa, marcador);
+      });
+    });
+  }
+
   // Inicializar el mapa 
   useEffect(() => {
     if (!window.google) {
@@ -141,36 +262,16 @@ function Inicio() {
       return;
     }
 
-    function agregarMarcadores(mapa, incidentes) {
-      incidentes.forEach((incidente) => {
-        const marcador = new google.maps.Marker({
-          position: { lat: incidente.latitude, lng: incidente.longitude },
-          map: mapa,
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-          content: `
-            <div>
-              <strong>Category:</strong> ${incidente.category}<br/>
-              <strong>Status:</strong> ${incidente.status}
-            </div>
-          `
-        });
-
-        marcador.addListener("click", () => {
-          infoWindow.open(mapa, marcador);
-        });
-      });
-    }
-
-
-  
     const map = new window.google.maps.Map(document.getElementById("map"), {
       center: { lat: 19.4326, lng: -99.1332 },
       zoom: 12,
-
     });
+    
+    // Guardar el mapa en una variable global para acceder a él en otras funciones
+    window.map = map;
+    window.markers = [];
 
+    // Inicialmente agregar los marcadores existentes
     agregarMarcadores(map, marcadores);
   
     let marker = null;
@@ -195,7 +296,13 @@ function Inicio() {
       // Actualizar los campos de lat/lng del formulario
       setLatitude(lat.toFixed(6));   // 6 decimales como estándar
       setLongitude(lng.toFixed(6));
+      
+      // Cargar incidentes cercanos a la posición clickeada
+      loadNearbyIncidents(lat, lng, searchRadius);
     });
+    
+    // Intentar obtener la ubicación actual del usuario
+    getCurrentLocation();
   }, []);
 
   return (
@@ -207,6 +314,21 @@ function Inicio() {
             <Card.Title>Map</Card.Title>
             <Card.Body>
               <div id="map" style={{ height: "500px", width: "100%" }}></div>
+              <div className="mt-2">
+                <Button variant="info" onClick={getCurrentLocation} className="me-2">
+                  Get My Location
+                </Button>
+                <Form.Label className="me-2">Search Radius (km):</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0.5"
+                  max="20"
+                  step="0.5"
+                  value={searchRadius}
+                  onChange={handleRadiusChange}
+                  style={{ width: "100px", display: "inline-block" }}
+                />
+              </div>
             </Card.Body>
           </Card>
         </Col>
@@ -214,8 +336,21 @@ function Inicio() {
         {/* Botones y formulario a la derecha */}
         <Col lg={4}>
           <Stack gap={2}>
-            <Button variant="dark" disabled>
-              Reported Incidents
+            <Button 
+              variant="dark" 
+              onClick={() => {
+                if (nearbyIncidents.length > 0) {
+                  setVariant("info");
+                  setMessage(`Showing ${nearbyIncidents.length} nearby incidents on the map`);
+                } else if (userLocation) {
+                  loadNearbyIncidents(userLocation.lat, userLocation.lng, searchRadius);
+                } else {
+                  setVariant("warning");
+                  setMessage("Please get your location first or click on the map");
+                }
+              }}
+            >
+              Reported Incidents ({nearbyIncidents.length})
             </Button>
             <Button variant="dark" onClick={() => setShowForm(!showForm)}>
               Register New Incident
