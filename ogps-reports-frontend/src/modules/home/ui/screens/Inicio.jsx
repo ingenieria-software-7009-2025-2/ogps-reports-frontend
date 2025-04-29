@@ -15,7 +15,7 @@ function Inicio() {
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState([]); // Array de archivos de imágenes
   const [photoPreviews, setPhotoPreviews] = useState([]); // Array de URLs para vista previa
-  const marcadores = [{
+  const incidentes = [{
       id: 1,
       title: "Bache en la calle",
       latitude: 19.4336,
