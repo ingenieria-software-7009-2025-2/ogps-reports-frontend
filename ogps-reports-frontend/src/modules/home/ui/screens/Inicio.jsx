@@ -143,8 +143,8 @@ function Inicio() {
 
     function agregarMarcadores(mapa, incidentes) {
         incidentes.forEach(incidente =>{
-            var marcador = new google.maps.Marker({
-                posicion = {latitud: incidente.latitud, longitud: incidente.longitud},}
+            const marcador = new google.maps.Marker({
+                posicion: {lat: incidente.latitude, lng: incidente.longitude},}
                 mapa: mapa,
                 });
             }
@@ -154,7 +154,7 @@ function Inicio() {
     const map = new window.google.maps.Map(document.getElementById("map"), {
       center: { lat: 19.4326, lng: -99.1332 },
       zoom: 12,
-      agregarMarcadores(mapa, incidentes);
+
     });
   
     let marker = null;
