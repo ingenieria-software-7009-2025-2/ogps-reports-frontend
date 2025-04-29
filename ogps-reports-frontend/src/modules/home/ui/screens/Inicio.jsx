@@ -142,26 +142,27 @@ function Inicio() {
     }
 
     function agregarMarcadores(mapa, incidentes) {
-        incidentes.forEach(incidente =>{
-            const marcador = new google.maps.Marker({
-                position: {lat: incidente.latitude, lng: incidente.longitude},
-                map: mapa,
-                }
-                )};
-            )};
+      incidentes.forEach((incidente) => {
+        const marcador = new google.maps.Marker({
+          position: { lat: incidente.latitude, lng: incidente.longitude },
+          map: mapa,
+        });
 
-    const infoWindow = new google.maps.InfoWindow({
-        content: `
-               <div>
-                  <strong>Tipo:</strong> ${incidente.tipo}<br/>
-                  <strong>Estado:</strong> ${incidente.estado}
-               </div>
-              `
-            });
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div>
+              <strong>Category:</strong> ${incidente.category}<br/>
+              <strong>Status:</strong> ${incidente.status}
+            </div>
+          `
+        });
 
-            marcador.addListener("click", () => {
-              infoWindow.open(mapa, marcador);
-            });
+        marcador.addListener("click", () => {
+          infoWindow.open(mapa, marcador);
+        });
+      });
+    }
+
 
   
     const map = new window.google.maps.Map(document.getElementById("map"), {
