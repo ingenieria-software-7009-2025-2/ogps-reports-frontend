@@ -111,6 +111,25 @@ const userApi = {
       }
     });
   },
+  getIncidentsByCategories: (categories) => {
+      return userApiInstance.get("/incidents/filter", {
+        params: { categories },
+        paramsSerializer: (params) => {
+          // Serializar el array de categorías para que se envíe como múltiples parámetros
+          return Object.entries(params)
+            .flatMap(([key, values]) =>
+              Array.isArray(values)
+                ? values.map((value) => `${key}=${encodeURIComponent(value)}`)
+                : `${key}=${encodeURIComponent(values)}`
+            )
+            .join("&");
+        },
+      });
+    },
+
+    getAvailableCategories: () => {
+      return userApiInstance.get("/incidents/categories");
+    },
 };
 
 export default userApi;
