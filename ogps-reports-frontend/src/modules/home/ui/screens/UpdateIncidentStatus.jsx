@@ -74,18 +74,6 @@ function UpdateIncidentStatus() {
       // Limpiar vistas previas de la imagenes
       photoPreviews.forEach(preview => URL.revokeObjectURL(preview));
       
-      // Regresar a la pantalla de detalles del incidente despues de tiempo de inactividad
-      setTimeout(() => {
-        navigate(`${INCIDENT_DETAILS_PATH}/${incident.idIncident}`, { 
-          state: { 
-            incident: { 
-              ...incident, 
-              status: status,
-              description: description || incident.description 
-            } 
-          } 
-        });
-      }, 1500);
 
     } catch (error) {
       setVariant("danger");
