@@ -130,6 +130,33 @@ const userApi = {
     getAvailableCategories: () => {
       return userApiInstance.get("/incidents/categories");
     },
+
+    updateIncidentStatus: (incidentId, updateData, photos = []) => {
+      const token = localStorage.getItem("authToken");
+      const formData = new FormData();
+      
+      // Agregar los datos de actualización
+      formData.append('status', updateData.status);
+      if (updateData.description) {
+        formData.append('description', updateData.description);
+      }
+      
+      // Agregar las fotos si existen
+      if (photos && photos.length > 0) {
+        photos.forEach((photo, index) => {
+          formData.append('photos', photo);
+          console.log(`Photo ${index}:`, photo.name, photo.size, photo.type);
+        });
+      } else {
+        console.log("No photos attached for status update");
+      }
+
+      return userApiInstance.put(`/incidents/${incidentId}/status`, formData, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+    },
 };
 
 export default userApi;

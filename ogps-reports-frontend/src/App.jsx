@@ -5,6 +5,7 @@ import Inicio from "./modules/home/ui/screens/Inicio";
 import Registro from "./modules/user/ui/screens/Registro";
 import LoginForm from "./modules/user/ui/screens/Login";
 import IncidentDetails from "./modules/home/ui/screens/IncidentDetails";
+import IncidentUpdate from "./modules/home/ui/screens/UpdateIncidentStatus";
 import userApi from "./network/userApi";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +15,7 @@ import {
   UPDATE_INFO_PATH,
   USER_INFO_PATH,
   INCIDENT_DETAILS_PATH,
+  UPDATE_INCIDENT_PATH,
 } from "./navigation/sitePaths";
 import UpdateInfoForm from "./modules/user/ui/screens/UpdateInfo";
 import UserInfo from "./modules/user/ui/screens/GetInfo";
@@ -125,6 +127,7 @@ const App = () => {
           <Route path={UPDATE_INFO_PATH} element={<UpdateInfoForm />} />
           <Route path={USER_INFO_PATH} element={<UserInfo />} />
           <Route path={`${INCIDENT_DETAILS_PATH}/:id`} element={<IncidentDetails />} />
+          <Route path={UPDATE_INCIDENT_PATH} element={<IncidentUpdate />} />
         </Routes>
       </div>
     </div>
