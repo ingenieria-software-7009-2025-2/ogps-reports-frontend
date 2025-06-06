@@ -29,6 +29,7 @@ function IncidentDetails() {
       try{
           await userApi.verifyIncident(incident.idIncident);
           setVariant("success");
+          incident.status = response.data.status;
           setMessage("Succesfully verified the incident");
           } catch (error) {
               setVariant("danger");
