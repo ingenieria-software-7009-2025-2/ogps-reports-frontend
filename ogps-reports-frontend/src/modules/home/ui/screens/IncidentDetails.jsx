@@ -23,6 +23,17 @@ function IncidentDetails() {
     alert("Validate Status functionality not implemented yet.");
   };
 
+  const handleVerify = async () => {
+      try{
+          const response = await userApi.verifyIncident(incident.idIncident);
+          setVariant("success");
+          setMessage("Verified Incident. Status: " + response.data.message);
+          } catch (error) {
+              setVariant("danger");
+              setMessage(error.response?.data?.error || "Error in verify incident.");
+              }
+          };
+
   return (
     <Container fluid className="pt-3">
       <Row>
@@ -98,6 +109,9 @@ function IncidentDetails() {
             </Button>
             <Button variant="dark" className="incident-details-button" onClick={handleValidateStatus}>
               Validate Status
+            </Button>
+            <Button variant="dark" className="incident-details-button" onClick={handleVerify} disabled={incident.status === "Resolved"}>
+                Verify Incident
             </Button>
           </div>
         </Col>
