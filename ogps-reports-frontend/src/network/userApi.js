@@ -130,6 +130,14 @@ const userApi = {
     getAvailableCategories: () => {
       return userApiInstance.get("/incidents/categories");
     },
+
+    verifyIncident: (incidentId) => {
+      return axios.post(`/v1/incidents/${incidentId}/verify`, {}, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+    }
 };
 
 export default userApi;

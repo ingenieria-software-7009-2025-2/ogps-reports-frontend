@@ -6,6 +6,8 @@ function IncidentDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const incident = location.state?.incident;
+  const [message, setMessage] = useState("");
+  const [variant, setVariant] = useState("danger");
 
   if (!incident) {
     return <Container><p>Incident not found.</p></Container>;
@@ -25,12 +27,12 @@ function IncidentDetails() {
 
   const handleVerify = async () => {
       try{
-          const response = await userApi.verifyIncident(incident.idIncident);
+          await userApi.verifyIncident(incident.idIncident);
           setVariant("success");
-          setMessage("Verified Incident. Status: " + response.data.message);
+          setMessage("Succesfully verified the incident");
           } catch (error) {
               setVariant("danger");
-              setMessage(error.response?.data?.error || "Error in verify incident.");
+              setMessage(error.response?.data?.error || "Error verifying incident.");
               }
           };
 
@@ -110,9 +112,11 @@ function IncidentDetails() {
             <Button variant="dark" className="incident-details-button" onClick={handleValidateStatus}>
               Validate Status
             </Button>
-            <Button variant="dark" className="incident-details-button" onClick={handleVerify} disabled={incident.status === "Resolved"}>
+            {incident.status !== "Resolved" && (
+            <Button variant="dark" className="incident-details-button" onClick={handleVerify}>
                 Verify Incident
             </Button>
+            )}
           </div>
         </Col>
       </Row>
