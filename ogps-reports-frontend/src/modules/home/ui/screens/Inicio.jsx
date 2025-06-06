@@ -31,7 +31,7 @@ function Inicio() {
 
   const marcadores = [
     {
-      id: 1,
+      idIncident: 1,
       title: "Pothole on the street",
       latitude: 19.4336,
       longitude: -99.1342,
@@ -106,7 +106,7 @@ function Inicio() {
         setMessage(`Loaded ${response.data.length} nearby incidents`);
 
         if (window.google && window.map) {
-          agregarMarcadores(window.map, response.data);
+          agregarMarcadores(window.map, response.data, handleViewDetails);
         }
       })
       .catch((error) => {
@@ -260,10 +260,18 @@ function Inicio() {
 
   const handleViewDetails = (incident) => {
     // Navegar a los detalles del incidente
-    navigate(`${INCIDENT_DETAILS_PATH}/${incident.idIncident}`, { state: { incident } });
+    const incidentId = incident.idIncident || incident.id;
+  
+    if (incidentId) {
+      navigate(`${INCIDENT_DETAILS_PATH}/${incidentId}`, { state: { incident } });
+    } else {
+    console.error("No se pudo obtener el ID del incidente:", incident);
+    setVariant("danger");
+    setMessage("Error: No se pudo acceder a los detalles del incidente");
+  }
   };
 
-  function agregarMarcadores(mapa, incidentes) {
+  function agregarMarcadores(mapa, incidentes, handleViewDetails) {
     // Agregar marcadores al mapa
     if (window.markers) {
       window.markers.forEach((marker) => marker.setMap(null));
@@ -291,8 +299,14 @@ function Inicio() {
         `,
       });
 
+      // Click simple para abrir la info
       marcador.addListener("click", () => {
         infoWindow.open(mapa, marcador);
+      });
+
+      // Doble click para navegar a detalles
+      marcador.addListener("dblclick", () => {
+        handleViewDetails(incidente);
       });
     });
   }
@@ -312,7 +326,7 @@ function Inicio() {
     window.map = map;
     window.markers = [];
 
-    agregarMarcadores(map, marcadores);
+    agregarMarcadores(map, marcadores, handleViewDetails);
 
     let marker = null;
 
@@ -362,7 +376,7 @@ function Inicio() {
       const response = await userApi.getIncidentsByCategories(selectedCategories);
       setFilteredIncidents(response.data);
       if (window.google && window.map) {
-        agregarMarcadores(window.map, response.data);
+        agregarMarcadores(window.map, response.data, handleViewDetails);
       }
       setVariant("success");
       setMessage(`Filtered ${response.data.length} incidents`);
@@ -376,7 +390,7 @@ function Inicio() {
           : "Error filtering incidents: " + (error.response?.data?.error || error.message)
       );
       if (window.google && window.map) {
-        agregarMarcadores(window.map, []);
+        agregarMarcadores(window.map, [], handleViewDetails);
       }
     } finally {
       setLoading(false);
@@ -391,7 +405,7 @@ function Inicio() {
       loadNearbyIncidents(userLocation.lat, userLocation.lng, searchRadius);
     } else {
       if (window.google && window.map) {
-        agregarMarcadores(window.map, marcadores);
+        agregarMarcadores(window.map, marcadores, handleViewDetails);
       }
     }
     setFilteredIncidents([]);
