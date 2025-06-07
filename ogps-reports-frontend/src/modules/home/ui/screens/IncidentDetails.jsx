@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Container, Row, Col, Button, Image, Alert } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HOME_PATH } from "../../../../navigation/sitePaths";
-import userApi from "../../../../network/UserApi";
+import userApi from "../../../../network/userApi";
 import { UPDATE_INCIDENT_PATH } from "../../../../navigation/sitePaths";
 
 function IncidentDetails() {
