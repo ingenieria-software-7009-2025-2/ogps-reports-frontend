@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, Container, Row, Col, Button, Image, Alert } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -18,41 +19,73 @@ function IncidentDetails() {
     return <Container><p>Incident not found.</p></Container>;
   }
 
+  // Debug: Verificar qué propiedades tiene el incident
+  console.log("Incident object:", incident);
+  console.log("Incident ID:", incident.idIncident || incident.id);
+
   // Cargar el contador de verificaciones al montar el componente
   useEffect(() => {
     const loadVerificationCount = async () => {
       try {
-        const count = await userApi.getVerificationCount(incident.idIncident);
+        // Usar el ID correcto del incidente
+        const incidentId = incident.idIncident || incident.id;
+        if (!incidentId) {
+          console.error("No incident ID found in incident object");
+          return;
+        }
+
+        const count = await userApi.getVerificationCount(incidentId);
         setVerificationCount(count);
+
+        // Si ya tiene 3 o más verificaciones, mostrar mensaje automáticamente
+        if (count >= 3) {
+          setMessage("The incident has been verified by the community");
+          setVariant("info");
+          setShowAlert(true);
+
+          // Ocultar el mensaje después de 5 segundos
+          setTimeout(() => {
+            setShowAlert(false);
+          }, 5000);
+        }
       } catch (error) {
         console.error("Error loading verification count:", error);
-        // Si hay error, mantenemos el contador en 0
         setVerificationCount(0);
       }
     };
 
-    if (incident?.idIncident) {
+    const incidentId = incident.idIncident || incident.id;
+    if (incidentId) {
       loadVerificationCount();
     }
-  }, [incident?.idIncident]);
+  }, [incident]);
 
   const handleBack = () => {
     navigate(HOME_PATH);
   };
 
-   const handleUpdateStatus = () => {
-    navigate(UPDATE_INCIDENT_PATH, { 
-      state: { incident } 
+  const handleUpdateStatus = () => {
+    navigate(UPDATE_INCIDENT_PATH, {
+      state: { incident }
     });
-  };
-
-  const handleValidateStatus = () => {
-    alert("Validate Status functionality not implemented yet.");
   };
 
   const handleVerify = async () => {
     try {
-      const response = await userApi.verifyIncident(incident.idIncident);
+      // Obtener el ID del incidente de forma más robusta
+      const incidentId = incident.idIncident || incident.id;
+
+      if (!incidentId) {
+        console.error("No se encontró ID del incidente:", incident);
+        setMessage("Error: No se pudo identificar el incidente");
+        setVariant("danger");
+        setShowAlert(true);
+        return;
+      }
+
+      console.log("Attempting to verify incident with ID:", incidentId);
+
+      const response = await userApi.verifyIncident(incidentId);
 
       // Manejar diferentes respuestas del backend
       const responseMessage = response.data;
@@ -64,11 +97,29 @@ function IncidentDetails() {
         setMessage("Successfully verified the incident");
         setVariant("success");
         // Actualizar el contador
-        setVerificationCount(prev => prev + 1);
+        const newCount = verificationCount + 1;
+        setVerificationCount(newCount);
+
+        // Verificar si llegó a 3 verificaciones
+        if (newCount >= 3) {
+          setTimeout(() => {
+            setMessage("The incident has been verified by the community");
+            setVariant("info");
+          }, 2000); // Mostrar el mensaje especial después de 2 segundos
+        }
       } else {
         setMessage("Successfully verified the incident");
         setVariant("success");
-        setVerificationCount(prev => prev + 1);
+        const newCount = verificationCount + 1;
+        setVerificationCount(newCount);
+
+        // Verificar si llegó a 3 verificaciones
+        if (newCount >= 3) {
+          setTimeout(() => {
+            setMessage("The incident has been verified by the community");
+            setVariant("info");
+          }, 2000); // Mostrar el mensaje especial después de 2 segundos
+        }
       }
 
       setShowAlert(true);
@@ -79,7 +130,16 @@ function IncidentDetails() {
       }, 5000);
     } catch (error) {
       console.error("Error verifying incident:", error);
-      setMessage("Error verifying incident");
+
+      // Mostrar mensaje más específico del error
+      let errorMessage = "Error verifying incident";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setMessage(errorMessage);
       setVariant("danger");
       setShowAlert(true);
 
@@ -163,23 +223,28 @@ function IncidentDetails() {
             <Button variant="dark" className="incident-details-button" onClick={handleUpdateStatus}>
               Update Status
             </Button>
-            <Button variant="dark" className="incident-details-button" onClick={handleValidateStatus}>
-              Validate Status
-            </Button>
             {incident.status !== "Resolved" && (
               <>
-                <Button variant="dark" className="incident-details-button" onClick={handleVerify}>
-                  Verify Incident
-                </Button>
+                {/* Solo mostrar el botón de verificar si no ha llegado a 3 verificaciones */}
+                {verificationCount < 3 && (
+                  <Button variant="dark" className="incident-details-button" onClick={handleVerify}>
+                    Verify Incident
+                  </Button>
+                )}
 
                 {/* Contador de verificaciones */}
                 <div className="text-center mt-2 mb-2">
                   <small className="text-muted">
                     Verified {verificationCount} time{verificationCount !== 1 ? 's' : ''}
+                    {verificationCount >= 3 && (
+                      <span className="text-success d-block fw-bold">
+                        ✓ Verified by Community
+                      </span>
+                    )}
                   </small>
                 </div>
 
-                {/* Mensaje de verificación SOLO debajo del botón */}
+                {/* Mensaje de verificación */}
                 {showAlert && (
                   <Alert variant={variant} className="mt-2 mb-2" style={{ fontSize: '0.85rem', padding: '0.5rem' }}>
                     {message}

@@ -9,7 +9,6 @@ function UpdateIncidentStatus() {
   const location = useLocation();
   const incident = location.state?.incident;
 
-  const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState([]);
   const [photoPreviews, setPhotoPreviews] = useState([]);
@@ -17,29 +16,19 @@ function UpdateIncidentStatus() {
   const [variant, setVariant] = useState("danger");
   const [loading, setLoading] = useState(false);
 
-  const statusOptions = [
-    "Reported",
-    "In Progress", 
-    "Resolved",
-    "Approved",
-    "Rejected"
-  ];
-
   useEffect(() => {
     if (!incident) {
       navigate(-1);
       return;
     }
-    // Estado inicial del incidente
-    setStatus(incident.status || "Reported");
   }, [incident, navigate]);
 
   const handlePhotoChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setPhotos(selectedFiles);
-    
+
     photoPreviews.forEach(preview => URL.revokeObjectURL(preview));
-    
+
     const previews = selectedFiles.map((file) => URL.createObjectURL(file));
     setPhotoPreviews(previews);
   };
@@ -47,9 +36,9 @@ function UpdateIncidentStatus() {
   const handleRemovePhoto = (index) => {
     const updatedPhotos = photos.filter((_, i) => i !== index);
     const updatedPreviews = photoPreviews.filter((_, i) => i !== index);
-    
+
     URL.revokeObjectURL(photoPreviews[index]);
-    
+
     setPhotos(updatedPhotos);
     setPhotoPreviews(updatedPreviews);
   };
@@ -61,23 +50,27 @@ function UpdateIncidentStatus() {
 
     try {
       const updateData = {
-        status,
+        status: incident.status, // Mantener el estado actual
         description: description.trim() || null,
       };
 
       // Llamar a la funcion de la API que actualiza el incidente
       await userApi.updateIncidentStatus(incident.idIncident, updateData, photos);
-      
+
       setVariant("success");
-      setMessage("Incident status updated successfully");
-      
+      setMessage("Additional information added successfully");
+
       // Limpiar vistas previas de la imagenes
       photoPreviews.forEach(preview => URL.revokeObjectURL(preview));
-      
+
+      // Limpiar formulario
+      setDescription("");
+      setPhotos([]);
+      setPhotoPreviews([]);
 
     } catch (error) {
       setVariant("danger");
-      setMessage("Error updating incident status: " + (error.response?.data?.message || error.message));
+      setMessage("Error updating incident: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -111,32 +104,17 @@ function UpdateIncidentStatus() {
         <Col lg={8}>
           <Card bg="light" className="mb-3">
             <Card.Body>
-              <h2 className="text-center mb-4">Update Status</h2>
-              
+              <h2 className="text-center mb-4">Incident Information</h2>
+
               {/* Current Incident Info */}
               <div className="mb-4 p-3 border rounded bg-white">
-                <h5>Current Incident: {incident.title}</h5>
-                <p><strong>Current Status:</strong> {incident.status}</p>
+                <h5>Incident: {incident.title}</h5>
+                <p><strong>Current Status:</strong> <span className="badge bg-primary">{incident.status}</span></p>
                 <p><strong>Type:</strong> {incident.category}</p>
                 <p><strong>Date:</strong> {new Date(incident.reportDate).toLocaleDateString()}</p>
               </div>
 
               <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Status *</Form.Label>
-                  <Form.Select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    required
-                  >
-                    {statusOptions.map((statusOption) => (
-                      <option key={statusOption} value={statusOption}>
-                        {statusOption}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-
                 <Form.Group className="mb-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
@@ -144,7 +122,7 @@ function UpdateIncidentStatus() {
                     rows={4}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Add any additional notes or comments about this status update..."
+                    placeholder="Add any additional notes or comments about this incident..."
                   />
                 </Form.Group>
 
@@ -159,8 +137,8 @@ function UpdateIncidentStatus() {
                       style={{ display: "none" }}
                       id="photo-upload"
                     />
-                    <Form.Label 
-                      htmlFor="photo-upload" 
+                    <Form.Label
+                      htmlFor="photo-upload"
                       className="btn btn-outline-secondary mb-0"
                       style={{ cursor: "pointer" }}
                     >
@@ -198,16 +176,18 @@ function UpdateIncidentStatus() {
                   </div>
                 )}
 
-                <div className="d-flex justify-content-center gap-3 mt-4">
-                  <Button 
-                    variant="dark" 
-                    type="submit" 
-                    disabled={loading}
-                    style={{ minWidth: "150px" }}
-                  >
-                    {loading ? "Updating..." : "Change Status to " + status}
-                  </Button>
-                </div>
+                {(description.trim() || photos.length > 0) && (
+                  <div className="d-flex justify-content-center gap-3 mt-4">
+                    <Button
+                      variant="dark"
+                      type="submit"
+                      disabled={loading}
+                      style={{ minWidth: "150px" }}
+                    >
+                      {loading ? "Adding..." : "Add Information"}
+                    </Button>
+                  </div>
+                )}
               </Form>
 
               {message && (
