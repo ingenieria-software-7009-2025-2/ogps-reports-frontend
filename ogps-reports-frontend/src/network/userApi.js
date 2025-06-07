@@ -131,13 +131,83 @@ const userApi = {
       return userApiInstance.get("/incidents/categories");
     },
 
-    verifyIncident: (incidentId) => {
-      return axios.post(`/v1/incidents/${incidentId}/verify`, {}, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+    // Nuevo método para verificar incidentes
+    verifyIncident: async (incidentId) => {
+      const token = localStorage.getItem("authToken");
+
+      if (!incidentId) {
+        throw new Error("Incident ID is required");
+      }
+
+      try {
+        // Primero obtenemos los datos del usuario para conseguir su ID
+        const userResponse = await userApiInstance.get("/users/me", {
+          headers: {
+            Authorization: `${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const userId = userResponse.data.id;
+
+        // Ahora hacemos la verificación del incidente
+        const response = await userApiInstance.post(`/incidents/${incidentId}/verify`,
+          {
+            idUser: userId
+          }, {
+          headers: {
+            Authorization: `${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        return response;
+      } catch (error) {
+        console.error("Error in verifyIncident:", error.response?.data || error.message);
+        throw error;
+      }
+    },
+
+    // Nuevo método para obtener el contador de verificaciones
+    getVerificationCount: async (incidentId) => {
+      const token = localStorage.getItem("authToken");
+
+      if (!incidentId) {
+        console.error("Incident ID is required for getVerificationCount");
+        throw new Error("Incident ID is required");
+      }
+
+      try {
+        console.log(`Fetching verification count for incident: ${incidentId}`);
+        const response = await userApiInstance.get(`/incidents/${incidentId}/verification-count`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(`Verification count response:`, response.data);
+
+        // Asegurarse de que retornamos un número
+        const count = typeof response.data === 'number' ? response.data : parseInt(response.data) || 0;
+        console.log(`Parsed verification count: ${count}`);
+
+        return count;
+      } catch (error) {
+        console.error("Error getting verification count:", error.response?.data || error.message);
+        console.error("Full error object:", error);
+
+        // Si el endpoint no existe (404) o hay otro error, retornamos 0
+        if (error.response?.status === 404) {
+          console.log("Verification count endpoint not found, returning 0");
+          return 0;
         }
-      });
-    }
+
+        // Para otros errores, también retornamos 0 pero logueamos más detalles
+        console.log("Returning 0 due to error");
+        return 0;
+      }
+    },
 };
 
 export default userApi;
