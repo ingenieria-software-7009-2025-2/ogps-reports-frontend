@@ -3,6 +3,7 @@ import { Card, Container, Row, Col, Button, Image, Alert } from "react-bootstrap
 import { useNavigate, useLocation } from "react-router-dom";
 import { HOME_PATH } from "../../../../navigation/sitePaths";
 import userApi from "../../../../network/UserApi";
+import { UPDATE_INCIDENT_PATH } from "../../../../navigation/sitePaths";
 
 function IncidentDetails() {
   const navigate = useNavigate();
@@ -39,8 +40,10 @@ function IncidentDetails() {
     navigate(HOME_PATH);
   };
 
-  const handleUpdateStatus = () => {
-    alert("Update Status functionality not implemented yet.");
+   const handleUpdateStatus = () => {
+    navigate(UPDATE_INCIDENT_PATH, { 
+      state: { incident } 
+    });
   };
 
   const handleValidateStatus = () => {

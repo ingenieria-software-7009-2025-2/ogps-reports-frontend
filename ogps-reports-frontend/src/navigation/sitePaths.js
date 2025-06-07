@@ -4,3 +4,4 @@ export const REGISTER_PATH = "registro";
 export const UPDATE_INFO_PATH = "actualizar-info";
 export const USER_INFO_PATH = "user-info";
 export const INCIDENT_DETAILS_PATH = "/incident-details";
+export const UPDATE_INCIDENT_PATH = "/update-incident-status";
