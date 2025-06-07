@@ -31,13 +31,14 @@ const LoginForm = () => {
         password: password,
       })
       .then((response) => {
-        if (response.status === 200) {
-          const { token } = response.data;
-          localStorage.setItem("authToken", token);
-          setVariant("success");
-          setMessage("Login successful");
-          navigate(HOME_PATH);
-        }
+       if (response.status === 200) {
+               const { token, id } = response.data;
+               localStorage.setItem("authToken", token);
+               localStorage.setItem("userId", id);
+               setVariant("success");
+               setMessage("Login successful");
+               navigate(HOME_PATH);
+             }
       })
       .catch((error) => {
           console.error("Error during login:", error);
